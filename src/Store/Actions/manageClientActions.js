@@ -1,0 +1,55 @@
+import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS } from './actionTypes';
+import axios from 'axios';
+
+const addingClient = () => {
+    return {
+        type : ADDING_CLIENT
+    }
+}
+
+const addClientSuccess = () => {
+    return {
+        type : ADD_CLIENT_SUCCESS
+    }
+}
+
+export const addClient = data => {
+    return dispatch => {
+        dispatch(addingClient());
+        axios.post('/clientInfo', data)
+           .then(res => {
+               if(res.status === 200){
+                 dispatch(addClientSuccess());
+               }
+           })
+           .catch(err => {
+               console.log(err);
+           })
+    }
+}
+
+const loadingClient = () => {
+    return {
+        type : LOADING_CLIENT
+    }
+}
+
+const loadClientSuccess = data => {
+    return {
+        type : LOAD_CLIENT_SUCCESS,
+        data : data
+    }
+}
+
+export const loadClient = page => {
+    return dispatch => {
+        dispatch(loadingClient())
+        axios.get(`/clientInfo/${page}`)
+           .then(result => {
+               dispatch(loadClientSuccess(result.data));
+           })
+           .catch(err => {
+               console.log(err);
+           })
+    }
+}
