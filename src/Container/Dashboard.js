@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import TopMenuBar from '../Components/TopMenuBar'
 import styled from 'styled-components';
 import SideDrawer from '../Components/SideDrawer';
@@ -11,11 +11,16 @@ import { Switch, Route } from 'react-router-dom';
 import Setting from '../Components/Setting';
 import ManageClient from '../Components/ManageClient';
 import ViewClient from '../Components/ViewClient';
+import DoneIcon from '@material-ui/icons/Done';
+import { Snackbar } from '@material-ui/core'
+import { connect } from 'react-redux';
+import { SET_SUCCESS } from '../Store/Actions/actionTypes';
 
-function Dashboard() {
+function Dashboard({ success, setSuccess }) {
  
     const [showDrawer, setShowDrawer] = useState(true); 
     const [openAddBtn, setOpenAddBtn] = useState(false);
+    const [openSnackBar, setOpenSnackBar] = useState(false);
 
     const handleDrawer = () => {
         setShowDrawer(!showDrawer);
@@ -24,6 +29,20 @@ function Dashboard() {
     const handleCloseAddBtn = () => {
         setOpenAddBtn(false);
     }
+
+    const handleCloseSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+        return;
+        }
+        setOpenSnackBar(false);
+     };
+
+     useEffect(() => {
+         if(success){
+            setOpenSnackBar(success);
+            setSuccess();
+         }
+     }, [success, setSuccess])
 
     return (
         <div>
@@ -47,11 +66,33 @@ function Dashboard() {
                   </AddButton>   
            </Container>    
            <AddClientForm openAddBtn={openAddBtn} handleCloseAddBtn={handleCloseAddBtn}/>
+           <StyledSnackbar
+                        anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                        }}
+                        open={openSnackBar}
+                        autoHideDuration={2000}
+                        message={<React.Fragment><DoneIcon fontSize='small'/> &nbsp;Record Created Successfully.</React.Fragment>}
+                        onClose={handleCloseSnackBar}
+          />
         </div>
     )
 }
 
-export default Dashboard;
+const mapStateToProps = state => {
+    return {
+        success: state.manageClientReducer.success,
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        setSuccess : () => dispatch({ type: SET_SUCCESS })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 
 const Container = styled.div`
     display: flex;
@@ -72,5 +113,19 @@ const AddButton = styled.div`
    position: absolute;
    bottom : 5%;
    right: 3%;
+`
+const StyledSnackbar = styled(Snackbar)`
+    &&& {
+        .MuiSnackbarContent-root {
+            ${({ theme }) => `
+                background: ${theme.palette.success.main};
+             `}
+        };
+        .MuiSnackbarContent-message {
+            display : flex;
+            align-items : center;
+            justify-content :center;
+        }
+    }
 `
 

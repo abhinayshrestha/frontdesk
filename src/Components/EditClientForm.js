@@ -56,12 +56,12 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
         setStatus({...status, value: event.target.value});
     }
 
-     const handleCloseSnackBar = (event, reason) => {
-            if (reason === 'clickaway') {
-            return;
-            }
-            setOpenSnackBar(false);
-      };
+    const handleCloseSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+        return;
+        }
+        setOpenSnackBar(false);
+    };
 
     const handleCreateRecord = () => {
         let nameError = false;
@@ -145,8 +145,8 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
         setSelectedDate({ ...inputType['date'],value: currentUser.date });
         setEmail({ ...inputType['email'], value: currentUser.email  });
         setPhone({  ...inputType['phone'], value: currentUser.phone  });
-        setAge({ ...inputType['age'], value: currentUser.age });
         setAddress({...inputType['address'], value: currentUser.address});
+        setAge({ ...inputType['age'], value: currentUser.age });
         setRemark({ ...inputType['remark'], value: currentUser.remark });
         setGender({ ...inputType['gender'], value: currentUser.gender });
         setAcademic({ ...inputType['academic'], value: currentUser.academic });
@@ -164,7 +164,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
                             onClick={e => e.stopPropagation()}>
                 <Title>
                         <Typography variant='subtitle2' style={{ fontSize: '17px' }} color='primary' align='center'>
-                            Add new client
+                            Update Client Info
                         </Typography>  
                 </Title> 
                 <Divider />
@@ -239,6 +239,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
                                                         <Select 
                                                                 labelId="demo-simple-select-outlined-label"
                                                                 id="demo-simple-select-outlined"
+                                                                
                                                                 value={age.value}
                                                                 onChange={e => setAge({...age, value: e.target.value})}
                                                                 label="Age"
@@ -378,7 +379,6 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
                                                         value={selectedDate.value}
                                                         onChange={handleDateChange}
                                                         inputVariant = 'outlined'
-                                                        disablePast
                                                         fullWidth
                                                         KeyboardButtonProps={{
                                                             'aria-label': 'change date',

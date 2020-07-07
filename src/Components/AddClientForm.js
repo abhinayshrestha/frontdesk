@@ -11,13 +11,11 @@ import { Paper,
         Select, 
         MenuItem, 
         InputLabel, 
-        FormControl, Button, FormHelperText, Snackbar } from '@material-ui/core';
+        FormControl, Button, FormHelperText } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { addClient } from '../Store/Actions/manageClientActions';
 import { connect } from 'react-redux';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { SET_SUCCESS } from '../Store/Actions/actionTypes';
-import DoneIcon from '@material-ui/icons/Done';
 
 const formVariants = {
     start : { opacity: 0, y: '-50vh' },
@@ -32,7 +30,7 @@ const formVariants = {
     }
 }
 
-function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, success, setSuccess, inputType }) {
+function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, success, inputType }) {
 
     const [status, setStatus] = useState({});
     const [selectedDate, setSelectedDate] = useState({});
@@ -47,7 +45,6 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
     const [height, setHeight] = useState({});
     const [weight, setWeight] = useState({});
     const [martial, setMartial] = useState({});
-    const [openSnackBar, setOpenSnackBar] = useState(false);
 
     const handleDateChange = (date) => {
       setSelectedDate({ ...selectedDate, value: date });
@@ -55,13 +52,6 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
     const handleChangeStatus = event => {
         setStatus({...status, value: event.target.value});
     }
-
-     const handleCloseSnackBar = (event, reason) => {
-            if (reason === 'clickaway') {
-            return;
-            }
-            setOpenSnackBar(false);
-      };
 
     const handleCreateRecord = () => {
         let nameError = false;
@@ -134,10 +124,8 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
             setHeight({ ...inputType['height']  });
             setWeight({ ...inputType['weight']  });
             setMartial({ ...inputType['martial']  });
-            setOpenSnackBar(true)
-            setSuccess();
         }
-    }, [success, setSuccess,name, inputType])
+    }, [success, name, inputType])
 
     useEffect(() => {
         setName({...inputType['name']}); 
@@ -417,16 +405,6 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
                         </Button>  
                 </ActionBar> 
                 </Container>    
-                <StyledSnackbar
-                        anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                        }}
-                        open={openSnackBar}
-                        autoHideDuration={2000}
-                        message={<React.Fragment><DoneIcon fontSize='small'/> &nbsp;Record Created Successfully.</React.Fragment>}
-                        onClose={handleCloseSnackBar}
-                    />
         </Backdrop>
     )
 }
@@ -442,7 +420,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         addClient : data => dispatch(addClient(data)),
-        setSuccess : () => dispatch({ type: SET_SUCCESS })
     }
 }
 
@@ -562,18 +539,4 @@ const SigninProgressBar = styled(LinearProgress)`
         && {
             height : 3px;
         }
-`
-const StyledSnackbar = styled(Snackbar)`
-    &&& {
-        .MuiSnackbarContent-root {
-            ${({ theme }) => `
-                background: ${theme.palette.success.main};
-             `}
-        };
-        .MuiSnackbarContent-message {
-            display : flex;
-            align-items : center;
-            justify-content :center;
-        }
-    }
 `

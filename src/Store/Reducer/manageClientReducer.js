@@ -6,6 +6,7 @@ const initState = {
     error : false,
     success : false,
     currentPage : 1,
+    loadClientLoader : false
 }
 
 const manageClientReducer = (state= initState, action) => {
@@ -25,13 +26,13 @@ const manageClientReducer = (state= initState, action) => {
           case LOADING_CLIENT : 
                         return {
                             ...state,
-                            loading: true
+                            loadClientLoader: true
                         }  
           case LOAD_CLIENT_SUCCESS : 
                         return {
                             ...state,
                             clients : [...action.data],
-                            loading : false
+                            loadClientLoader : false
                         }                      
           case SET_SUCCESS : 
                     return {

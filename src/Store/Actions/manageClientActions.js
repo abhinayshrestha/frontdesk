@@ -42,9 +42,9 @@ const loadClientSuccess = data => {
 }
 
 export const loadClient = (page, orderType, status) => {
-    let url = `https://front-desk-api.herokuapp.com/clientInfo?page=${page}&order=${orderType}&status=${status}`;
+    let url = `/clientInfo?page=${page}&order=${orderType}&status=${status}`;
     if(status === 'all'){
-        url = `https://front-desk-api.herokuapp.com/clientInfo?page=${page}&order=${orderType}`;
+        url = `/clientInfo?page=${page}&order=${orderType}`;
     }
     return dispatch => {
         dispatch(loadingClient())

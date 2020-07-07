@@ -68,27 +68,35 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
           loadClient(1, orderType.value, status.value);
       }
 
-      const usePrevious = (value) => {
+      const usePreviousStatus = (value) => {
         const ref = useRef();
         useEffect(() => {
           ref.current = value;
         });
         return ref.current;
       }
-      const statusVal = usePrevious(status.value)
+      const usePreviousOrderType = (value) => {
+        const ref = useRef();
+        useEffect(() => {
+          ref.current = value;
+        });
+        return ref.current;
+      }
+     const statusVal = usePreviousStatus(status.value)
+     const orderTyp = usePreviousOrderType(orderType.value)
      useEffect(() => {
-         if( statusVal === status.value ) {
+         if( statusVal === status.value && orderTyp === orderType.value ) {
             loadClient(page, orderType.value, status.value);
          }
          if( statusVal === undefined ) {
             loadClient(1 , orderType.value, status.value);
          }
-      }, [loadClient, page, orderType.value, status.value, statusVal])
+      }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp])
 
     return (
         <>
              <AlertBox openAlert={openAlert} handleCloseAlert={handleCloseAlert}/>
-             {openEdit && <EditClientForm openEdit={openEdit.is} currentUser={openEdit.data} closeEditHandler={closeEditHandler}/>}
+             {openEdit.is && <EditClientForm openEdit={openEdit.is} currentUser={openEdit.data} closeEditHandler={closeEditHandler}/>}
               <div style={{ marginBottom: '20px' }}>
                 <TopNavText navText={['Management','>','Manage Client']} summaryText="View all clients"/>   
              </div>
@@ -223,7 +231,7 @@ const mapStateToProps = state => {
     return {
         statusOpt : state.settingReducer.entryForm.status.options,
         clients : state.manageClientReducer.clients,
-        loading : state.manageClientReducer.loading,
+        loading : state.manageClientReducer.loadClientLoader,
     }
 }
 
