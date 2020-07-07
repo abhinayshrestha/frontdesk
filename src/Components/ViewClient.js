@@ -159,7 +159,7 @@ function ViewClient({ templateMsg }) {
                                 <MessageBody>
                                         <div className='receipt'>
                                              <Typography variant='body2' color='textSecondary'>
-                                                    To : <Chip variant="outlined" color="primary" label='9816593608' size="small"/>
+                                                    To : <Chip component='span' variant="outlined" color="primary" label='9816593608' size="small"/>
                                               </Typography>      
                                          </div>   
                                          <StyledTextField
@@ -216,8 +216,8 @@ function ViewClient({ templateMsg }) {
                               </StyledPaper>  
                         <StyledPaper style={{ marginTop : '20px' }}>
                             <div style={{ padding: '15px' }}>
-                                <Typography variant='body1' color='textSecondary' style={{ fontSize: '14px' }}>
-                                <Box color='gray'>Remember, if the record is deleted permanently it cannot be brought back.</Box>
+                                <Typography component='div' variant='body1' style={{ fontSize: '14px' }}>
+                                     <Box color='gray'>Remember, if the record is deleted permanently it cannot be brought back.</Box>
                                 </Typography>   
                                 <div style={{ display: 'flex', justifyContent : 'flex-end', marginTop : '10px' }}>
                                         
@@ -242,7 +242,7 @@ function ViewClient({ templateMsg }) {
                                 <MessageBody>
                                         <div className='receipt'>
                                              <Typography variant='body2' color='textSecondary'>
-                                                    To : <Chip variant="outlined" color="primary" label='abhinay.shrestha11@gmail.com' size="small"/>
+                                                    To : <Chip component='span' variant="outlined" color="primary" label='abhinay.shrestha11@gmail.com' size="small"/>
                                               </Typography>      
                                          </div>   
                                          <StyledTextField
@@ -263,6 +263,7 @@ function ViewClient({ templateMsg }) {
                                              attachment[0] &&
                                              attachment.map((file, i) => 
                                                  <Chip label={file.name} 
+                                                        component='span'
                                                         size="small" 
                                                         color = 'primary'
                                                         variant = 'outlined'

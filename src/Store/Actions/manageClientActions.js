@@ -41,10 +41,14 @@ const loadClientSuccess = data => {
     }
 }
 
-export const loadClient = page => {
+export const loadClient = (page, orderType, status) => {
+    let url = `https://front-desk-api.herokuapp.com/clientInfo?page=${page}&order=${orderType}&status=${status}`;
+    if(status === 'all'){
+        url = `https://front-desk-api.herokuapp.com/clientInfo?page=${page}&order=${orderType}`;
+    }
     return dispatch => {
         dispatch(loadingClient())
-        axios.get(`/clientInfo/${page}`)
+        axios.get(url)
            .then(result => {
                dispatch(loadClientSuccess(result.data));
            })

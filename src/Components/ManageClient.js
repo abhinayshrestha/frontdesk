@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components';
 import TopNavText from './UI/TopNavText';
 import { FormControl, InputLabel, Select, MenuItem, Button, Avatar, Typography, CircularProgress } from '@material-ui/core';
@@ -19,15 +19,25 @@ import { connect } from 'react-redux';
 import AlertBox from './UI/AlertBox';
 import { NavLink, useLocation } from 'react-router-dom';
 import { loadClient } from '../Store/Actions/manageClientActions';
+import EditClientForm from './EditClientForm';
 
 function ManageClient({ statusOpt, loadClient, clients, loading }) {
 
-    const [status, setStatus] = useState({ value: 'All' });
+    const [status, setStatus] = useState({ value: 'all' });
     const [orderBy, setOrderBy] = useState({ value: 'Date', options: ["Date", "Name", "Last 10 days"] });
-    const [orderType, setOrderType] = useState({ value: 'Ascending', options:["Ascending", "Descending"] });
+    const [orderType, setOrderType] = useState({ value: 'desc', options:[{value:'asc', label : "Ascending"},{value:'desc', label : "Descending"}] });
     const [openAlert, setOpenAlert] = useState(false);
     const [page, setPage] = useState(1);
+    const [openEdit, setOpenEdit] = useState({ is: false, data: {} });
     const { pathname } = useLocation();
+
+    const openEditHandler = (user) => {
+         setOpenEdit({ ...openEdit, is : true , data: { ...user } })
+    }
+    
+    const closeEditHandler = () => {
+        setOpenEdit({ is: false, data : {} });
+    }
 
     const handleChangeStatus = e => {
         setStatus({ value: e.target.value })
@@ -53,13 +63,32 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
         setPage(value);
       };
 
+      const searchHandler = () => {
+          setPage(1);
+          loadClient(1, orderType.value, status.value);
+      }
+
+      const usePrevious = (value) => {
+        const ref = useRef();
+        useEffect(() => {
+          ref.current = value;
+        });
+        return ref.current;
+      }
+      const statusVal = usePrevious(status.value)
      useEffect(() => {
-          loadClient(page);
-      }, [loadClient, page])
+         if( statusVal === status.value ) {
+            loadClient(page, orderType.value, status.value);
+         }
+         if( statusVal === undefined ) {
+            loadClient(1 , orderType.value, status.value);
+         }
+      }, [loadClient, page, orderType.value, status.value, statusVal])
 
     return (
         <>
              <AlertBox openAlert={openAlert} handleCloseAlert={handleCloseAlert}/>
+             {openEdit && <EditClientForm openEdit={openEdit.is} currentUser={openEdit.data} closeEditHandler={closeEditHandler}/>}
               <div style={{ marginBottom: '20px' }}>
                 <TopNavText navText={['Management','>','Manage Client']} summaryText="View all clients"/>   
              </div>
@@ -77,7 +106,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                             onChange={handleChangeStatus}
                                             label="Status"
                                             >
-                                            <MenuItem value="All">All</MenuItem>
+                                            <MenuItem value="all">All</MenuItem>
                                             {
                                                 statusOpt.map((opt, i) => <MenuItem value={opt} key={i}>{opt}</MenuItem>)
                                             }    
@@ -105,11 +134,13 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                             label="Order Type"
                                             >
                                             {
-                                                orderType.options.map((opt, i) => <MenuItem value={opt} key={i}>{opt}</MenuItem>)
+                                                orderType.options.map((opt, i) => <MenuItem value={opt.value} key={i}>{opt.label}</MenuItem>)
                                             }    
                                     </Select>
                           </StyledFormControl>
-                          <Button variant='contained' color='primary' disableElevation style={{ textTransform: 'capitalize', marginRight: '10px' }}>
+                          <Button variant='contained' color='primary' disableElevation 
+                                  style={{ textTransform: 'capitalize', marginRight: '10px' }}
+                                  onClick={searchHandler}>
                                   Search              
                           </Button>    
                  </ActionArea> 
@@ -147,24 +178,26 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                                         <TableCell align="center">{client.address}</TableCell>
                                                         <TableCell align="center">{client.status}</TableCell>
                                                         <TableCell align="center">{client.phone}</TableCell>
-                                                        <TableCell align="center" style={{ display : 'flex' }}>
-                                                            <Tooltip title="View or Message">
-                                                                <NavLink to={`${pathname}/abhinay`}>
-                                                                        <StyledIconButton aria-label="View">
-                                                                            <VisibilityIcon />
+                                                        <TableCell align="center">
+                                                            <div style={{ display : 'flex' }}>
+                                                                <Tooltip title="View or Message">
+                                                                    <NavLink to={`${pathname}/abhinay`}>
+                                                                            <StyledIconButton aria-label="View">
+                                                                                <VisibilityIcon />
+                                                                            </StyledIconButton>
+                                                                    </NavLink>  
+                                                                </Tooltip>
+                                                                <Tooltip title="Edit">
+                                                                        <StyledIconButton aria-label="Edit" color='primary' onClick={openEditHandler.bind(null, client)}>
+                                                                            <EditIcon />
                                                                         </StyledIconButton>
-                                                                </NavLink>  
-                                                            </Tooltip>
-                                                            <Tooltip title="Edit">
-                                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                                        <EditIcon />
-                                                                    </StyledIconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title="Delete">
-                                                                    <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox}>
-                                                                        <DeleteIcon/>
-                                                                    </StyledIconButton>
-                                                            </Tooltip>
+                                                                </Tooltip>
+                                                                <Tooltip title="Delete">
+                                                                        <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox}>
+                                                                            <DeleteIcon/>
+                                                                        </StyledIconButton>
+                                                                </Tooltip>
+                                                             </div>   
                                                         </TableCell>
                                                         <TableCell align="center">{new Date(client.createdAt).toDateString()}</TableCell>
                                                 </TableRow>
@@ -196,7 +229,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        loadClient : page => dispatch(loadClient(page))
+        loadClient : (page, orderType, status) => dispatch(loadClient(page, orderType, status)),
     }
 }
 

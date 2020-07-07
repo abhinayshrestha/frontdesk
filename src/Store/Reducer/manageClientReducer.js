@@ -5,6 +5,7 @@ const initState = {
     loading : false,
     error : false,
     success : false,
+    currentPage : 1,
 }
 
 const manageClientReducer = (state= initState, action) => {
