@@ -1,4 +1,4 @@
-import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS } from './actionTypes';
+import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS, UPDATE_CLIENT_SUCCESS, UPDATING_CLIENT } from './actionTypes';
 import axios from 'axios';
 
 const addingClient = () => {
@@ -55,5 +55,31 @@ export const loadClient = (page, orderType, status) => {
            .catch(err => {
                console.log(err);
            })
+    }
+}
+
+const updatingClient = () => {
+    return {
+        type : UPDATING_CLIENT
+    }
+}
+
+const updateClientSuccess = data => {
+    return {
+        type : UPDATE_CLIENT_SUCCESS
+    }
+}
+
+export const updateClient = (data, id) => {
+    console.log(id);
+    return dispatch => {
+        dispatch(updatingClient());
+        axios.patch(`/updateClientInfo/${id}`, data)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 }

@@ -38,11 +38,11 @@ function Dashboard({ success, setSuccess }) {
      };
 
      useEffect(() => {
-         if(success){
-            setOpenSnackBar(success);
+         if(success.value && success.label !== ''){
+            setOpenSnackBar(success.value);
             setSuccess();
          }
-     }, [success, setSuccess])
+     }, [success.value, setSuccess, success.label])
 
     return (
         <div>
@@ -73,7 +73,7 @@ function Dashboard({ success, setSuccess }) {
                         }}
                         open={openSnackBar}
                         autoHideDuration={2000}
-                        message={<React.Fragment><DoneIcon fontSize='small'/> &nbsp;Record Created Successfully.</React.Fragment>}
+                          message={<React.Fragment><DoneIcon fontSize='small'/> &nbsp;{success.label}</React.Fragment>}
                         onClose={handleCloseSnackBar}
           />
         </div>

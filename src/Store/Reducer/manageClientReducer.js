@@ -4,7 +4,7 @@ const initState = {
     clients : [],
     loading : false,
     error : false,
-    success : false,
+    success : { value : false, label : '' },
     currentPage : 1,
     loadClientLoader : false
 }
@@ -20,7 +20,11 @@ const manageClientReducer = (state= initState, action) => {
                     return {
                         ...state,
                         loading: false,
-                        success : true,
+                        success : {
+                            ...state.success,
+                            value : true,
+                            label : 'Record added Successfully.'
+                        },
                         error : false
                     }  
           case LOADING_CLIENT : 
@@ -37,7 +41,10 @@ const manageClientReducer = (state= initState, action) => {
           case SET_SUCCESS : 
                     return {
                         ...state,
-                        success : false,
+                        success : {
+                            ...state.success,
+                            value : false
+                        },
                     }
           default : return state;        
       }

@@ -11,14 +11,11 @@ import { Paper,
         Select, 
         MenuItem, 
         InputLabel, 
-        FormControl, Button, FormHelperText, Snackbar } from '@material-ui/core';
+        FormControl, Button, FormHelperText } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { addClient } from '../Store/Actions/manageClientActions';
+import { updateClient } from '../Store/Actions/manageClientActions';
 import { connect } from 'react-redux';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { SET_SUCCESS } from '../Store/Actions/actionTypes';
-import DoneIcon from '@material-ui/icons/Done';
-
 const formVariants = {
     start : { opacity: 0, y: '-50vh' },
     end : {
@@ -32,7 +29,7 @@ const formVariants = {
     }
 }
 
-function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
+function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, updateClient }) {
 
     const [status, setStatus] = useState({});
     const [selectedDate, setSelectedDate] = useState({});
@@ -47,7 +44,6 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
     const [height, setHeight] = useState({});
     const [weight, setWeight] = useState({});
     const [martial, setMartial] = useState({});
-    const [openSnackBar, setOpenSnackBar] = useState(false);
 
     const handleDateChange = (date) => {
       setSelectedDate({ ...selectedDate, value: date });
@@ -56,14 +52,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
         setStatus({...status, value: event.target.value});
     }
 
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-        return;
-        }
-        setOpenSnackBar(false);
-    };
-
-    const handleCreateRecord = () => {
+    const handleUpdateRecord = () => {
         let nameError = false;
         let emailError = false;
         let phoneError = false;
@@ -107,15 +96,14 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
                 phone: phone.value,
                 address: address.value,
                 status: status.value,
-                selectedDate: selectedDate,
                 remark: remark.value,
                 martialStatus : martial.value,
                 height: height.value,
                 date : selectedDate.value,
                 gender : gender.value,
-                academic : academic.value
+                academic : academic.value,
             }
-            addClient(data);
+            updateClient(data, currentUser.id);
         }
     }
 
@@ -152,7 +140,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
         setAcademic({ ...inputType['academic'], value: currentUser.academic });
         setHeight({ ...inputType['height'], value: currentUser.height });
         setWeight({ ...inputType['weight'], value: currentUser.weight });
-        setMartial({ ...inputType['martial'], value: currentUser.martial });
+        setMartial({ ...inputType['martial'], value: currentUser.maritalStatus });
     }, [inputType, currentUser])
 
     return (
@@ -406,25 +394,16 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser }) {
                  </Grid> 
                  <Divider />
                  <ActionBar>
-                        <Button size="small" variant="contained" color="primary" disableElevation style={{ marginRight: '10px' }}>
-                               Create     
+                        <Button size="small" variant="contained" color="primary" disableElevation style={{ marginRight: '10px' }}
+                                onClick={handleUpdateRecord}>
+                               Update     
                         </Button>   
                         <Button size="small" variant="contained" color="default" disableElevation
                                 onClick={closeEditHandler}>
                                Cancel     
                         </Button>  
                 </ActionBar> 
-                </Container>    
-                <StyledSnackbar
-                        anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                        }}
-                        open={openSnackBar}
-                        autoHideDuration={2000}
-                        message={<React.Fragment><DoneIcon fontSize='small'/> &nbsp;Record Created Successfully.</React.Fragment>}
-                        onClose={handleCloseSnackBar}
-                    />
+                </Container>  
         </Backdrop>
     )
 }
@@ -439,8 +418,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        addClient : data => dispatch(addClient(data)),
-        setSuccess : () => dispatch({ type: SET_SUCCESS })
+        updateClient : (data, id) => dispatch(updateClient(data, id)),
     }
 }
 
@@ -560,18 +538,4 @@ const SigninProgressBar = styled(LinearProgress)`
         && {
             height : 3px;
         }
-`
-const StyledSnackbar = styled(Snackbar)`
-    &&& {
-        .MuiSnackbarContent-root {
-            ${({ theme }) => `
-                background: ${theme.palette.success.main};
-             `}
-        };
-        .MuiSnackbarContent-message {
-            display : flex;
-            align-items : center;
-            justify-content :center;
-        }
-    }
 `

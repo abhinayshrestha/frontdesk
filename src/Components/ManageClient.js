@@ -187,7 +187,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                                         <TableCell align="center">{client.status}</TableCell>
                                                         <TableCell align="center">{client.phone}</TableCell>
                                                         <TableCell align="center">
-                                                            <div style={{ display : 'flex' }}>
+                                                            <div style={{ display : 'flex', justifyContent: 'center' }}>
                                                                 <Tooltip title="View or Message">
                                                                     <NavLink to={`${pathname}/abhinay`}>
                                                                             <StyledIconButton aria-label="View">

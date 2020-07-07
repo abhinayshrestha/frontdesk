@@ -97,7 +97,6 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
                 phone: phone.value,
                 address: address.value,
                 status: status.value,
-                selectedDate: selectedDate,
                 remark: remark.value,
                 martialStatus : martial.value,
                 height: height.value,
@@ -110,7 +109,7 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
     }
 
     useEffect(() => {
-        if(success) {
+        if(success.value) {
             setName({...inputType['name']}); 
             setStatus({...inputType['status']});
             setSelectedDate({ ...inputType['date'] });
@@ -125,7 +124,7 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
             setWeight({ ...inputType['weight']  });
             setMartial({ ...inputType['martial']  });
         }
-    }, [success, name, inputType])
+    }, [success.value, name, inputType])
 
     useEffect(() => {
         setName({...inputType['name']}); 
