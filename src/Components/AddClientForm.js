@@ -47,7 +47,8 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
     const [martial, setMartial] = useState({});
 
     const handleDateChange = (date) => {
-      setSelectedDate({ ...selectedDate, value: date });
+        const newDate = date.toISOString().slice(0, date.toISOString().lastIndexOf('T'));  
+        setSelectedDate({ ...selectedDate, value: newDate });
     };
     const handleChangeStatus = event => {
         setStatus({...status, value: event.target.value});
@@ -361,7 +362,7 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
                                                         margin="dense"
                                                         id="date-picker-dialog"
                                                         label="Select Date"
-                                                        format="MM/dd/yyyy"
+                                                        format="yyyy/MM/dd"
                                                         value={selectedDate.value}
                                                         onChange={handleDateChange}
                                                         inputVariant = 'outlined'

@@ -18,7 +18,7 @@ import { SET_SUCCESS } from '../Store/Actions/actionTypes';
 
 function Dashboard({ success, setSuccess }) {
  
-    const [showDrawer, setShowDrawer] = useState(true); 
+    const [showDrawer, setShowDrawer] = useState(false); 
     const [openAddBtn, setOpenAddBtn] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
 
@@ -72,7 +72,7 @@ function Dashboard({ success, setSuccess }) {
                         horizontal: 'center',
                         }}
                         open={openSnackBar}
-                        autoHideDuration={2000}
+                        autoHideDuration={3000}
                           message={<React.Fragment><DoneIcon fontSize='small'/> &nbsp;{success.label}</React.Fragment>}
                         onClose={handleCloseSnackBar}
           />

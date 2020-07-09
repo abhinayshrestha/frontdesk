@@ -29,7 +29,7 @@ const formVariants = {
     }
 }
 
-function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, updateClient }) {
+function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, updateClient, success, loading }) {
 
     const [status, setStatus] = useState({});
     const [selectedDate, setSelectedDate] = useState({});
@@ -46,7 +46,8 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
     const [martial, setMartial] = useState({});
 
     const handleDateChange = (date) => {
-      setSelectedDate({ ...selectedDate, value: date });
+      const newDate = date.toISOString().slice(0, date.toISOString().lastIndexOf('T'));  
+      setSelectedDate({ ...selectedDate, value: newDate });
     };
     const handleChangeStatus = event => {
         setStatus({...status, value: event.target.value});
@@ -107,25 +108,11 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
         }
     }
 
-    // useEffect(() => {
-    //     if(success) {
-    //         setName({...inputType['name']}); 
-    //         setStatus({...inputType['status']});
-    //         setSelectedDate({ ...inputType['date'] });
-    //         setEmail({ ...inputType['email']  });
-    //         setPhone({  ...inputType['phone']  });
-    //         setAge({ ...inputType['age']  });
-    //         setAddress({...inputType['address']  });
-    //         setRemark({ ...inputType['remark']  });
-    //         setGender({ ...inputType['gender']  });
-    //         setAcademic({ ...inputType['academic']  });
-    //         setHeight({ ...inputType['height']  });
-    //         setWeight({ ...inputType['weight']  });
-    //         setMartial({ ...inputType['martial']  });
-    //         setOpenSnackBar(true)
-    //         setSuccess();
-    //     }
-    // }, [inputType])
+    useEffect(() => {
+        if(success.value) {
+            closeEditHandler();
+        }
+    }, [success, closeEditHandler])
 
     useEffect(() => {
         setName({...inputType['name'], value: currentUser.name}); 
@@ -156,7 +143,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
                         </Typography>  
                 </Title> 
                 <Divider />
-                {/* { loading ? <SigninProgressBar /> : null } */}
+                { loading ? <SigninProgressBar /> : null }
                 <Grid container style={{ boxSizing: 'border-box', padding: '20px 30px' }}>
                             {name.checked && <GridItem item lg={4} md={3} sm={6} xs={12}>
                                 <InputContainer>
@@ -363,9 +350,11 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
                                                         margin="dense"
                                                         id="date-picker-dialog"
                                                         label="Select Date"
-                                                        format="MM/dd/yyyy"
+                                                        format="yyyy/MM/dd"
+                                                        views={["year", "month", "date"]}
                                                         value={selectedDate.value}
                                                         onChange={handleDateChange}
+                                                        maskChar
                                                         inputVariant = 'outlined'
                                                         fullWidth
                                                         KeyboardButtonProps={{
@@ -395,11 +384,13 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
                  <Divider />
                  <ActionBar>
                         <Button size="small" variant="contained" color="primary" disableElevation style={{ marginRight: '10px' }}
-                                onClick={handleUpdateRecord}>
+                                onClick={handleUpdateRecord}
+                                disabled={loading}>
                                Update     
                         </Button>   
                         <Button size="small" variant="contained" color="default" disableElevation
-                                onClick={closeEditHandler}>
+                                onClick={closeEditHandler}
+                                disabled={loading}>
                                Cancel     
                         </Button>  
                 </ActionBar> 
@@ -409,8 +400,9 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
 }
 
 const mapStateToProps = state => {
+    console.log(state.manageClientReducer.updateClientLoader)
     return {
-        loading: state.manageClientReducer.loading,
+        loading: state.manageClientReducer.updateClientLoader,
         success: state.manageClientReducer.success,
         inputType: state.settingReducer.entryForm
     }

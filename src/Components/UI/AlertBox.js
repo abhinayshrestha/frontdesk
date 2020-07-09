@@ -3,7 +3,7 @@ import { Typography, Paper, Button } from '@material-ui/core';
 import Backdrop from './Backdrop';
 import styled from 'styled-components';
 
-function AlertBox({ openAlert, handleCloseAlert }) {
+function AlertBox({ openAlert, handleCloseAlert, onAction }) {
 
     return (
         <Backdrop open={openAlert}>
@@ -12,7 +12,7 @@ function AlertBox({ openAlert, handleCloseAlert }) {
                           Are you sure you want to delete this record permanently?
                     </Typography> 
                     <div className='actionArea'>
-                        <StyledButton size='small' variant='contained' color='secondary' disableElevation>
+                        <StyledButton size='small' variant='contained' color='secondary' onClick={() => onAction()} disableElevation>
                             Delete
                          </StyledButton>   
                          <StyledButton size='small' variant='contained' disableElevation onClick={handleCloseAlert}>

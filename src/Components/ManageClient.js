@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components';
 import TopNavText from './UI/TopNavText';
-import { FormControl, InputLabel, Select, MenuItem, Button, Avatar, Typography, CircularProgress } from '@material-ui/core';
+import { FormControl, InputLabel, Select, MenuItem, Button, Avatar, Typography, CircularProgress, Checkbox } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -18,18 +18,20 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { connect } from 'react-redux';
 import AlertBox from './UI/AlertBox';
 import { NavLink, useLocation } from 'react-router-dom';
-import { loadClient } from '../Store/Actions/manageClientActions';
+import { loadClient, deleteClient } from '../Store/Actions/manageClientActions';
 import EditClientForm from './EditClientForm';
 
-function ManageClient({ statusOpt, loadClient, clients, loading }) {
+function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient }) {
 
     const [status, setStatus] = useState({ value: 'all' });
     const [orderBy, setOrderBy] = useState({ value: 'Date', options: ["Date", "Name", "Last 10 days"] });
-    const [orderType, setOrderType] = useState({ value: 'desc', options:[{value:'asc', label : "Ascending"},{value:'desc', label : "Descending"}] });
-    const [openAlert, setOpenAlert] = useState(false);
+    const [orderType, setOrderType] = useState({ value: 'desc', options:[{value:'asc', label : "Ascending"},{value:'desc', label : "Descending"}]});
+    const [openAlert, setOpenAlert] = useState({ value : false, id : '' });
     const [page, setPage] = useState(1);
     const [openEdit, setOpenEdit] = useState({ is: false, data: {} });
+    const [checkedUser, setCheckedUser] = useState([]);
     const { pathname } = useLocation();
+    const [checkBoxValue, setCheckBoxValue] = useState(undefined);
 
     const openEditHandler = (user) => {
          setOpenEdit({ ...openEdit, is : true , data: { ...user } })
@@ -51,12 +53,12 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
         setOrderType({ ...orderType, value: e.target.value })
     }
  
-    const openAlertBox = () => {
-        setOpenAlert(true);
+    const openAlertBox = id => {
+        setOpenAlert({ ...openAlert, value : true, id : id });
     }
 
     const handleCloseAlert = () => {
-        setOpenAlert(false);
+        setOpenAlert({ ...openAlert, value : false, id : '' });
     }
 
     const handlePageChange = (event, value) => {
@@ -64,8 +66,41 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
       };
 
       const searchHandler = () => {
+          setCheckedUser([]);
           setPage(1);
           loadClient(1, orderType.value, status.value);
+      }
+
+      const checkboxHandler = (id, event) => {
+        if(event.target.checked){
+            setCheckedUser(checkedUser.concat(id));
+        }
+        else {
+            const checkedArray = [...checkedUser];
+            const i = checkedArray.indexOf(id);
+            checkedArray.splice(i, 1);
+            setCheckedUser([...checkedArray]);
+        }  
+      }
+
+      useEffect(() => {
+          setCheckedUser([]);
+      }, [page])
+
+      useEffect(() => {
+         console.log(checkedUser);
+      }, [checkedUser])
+
+      const handleDeleteRecord = () => {
+         deleteClient(openAlert.id);
+      }
+
+      const multipleSelectHandler = e => {
+            if(e.target.checked) {
+                setCheckBoxValue(true);
+            }    
+            else {setCheckBoxValue(undefined);}
+
       }
 
       const usePreviousStatus = (value) => {
@@ -88,15 +123,20 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
          if( statusVal === status.value && orderTyp === orderType.value ) {
             loadClient(page, orderType.value, status.value);
          }
-         if( statusVal === undefined ) {
+         else if( statusVal === undefined ) {
             loadClient(1 , orderType.value, status.value);
          }
       }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp])
 
     return (
         <>
-             <AlertBox openAlert={openAlert} handleCloseAlert={handleCloseAlert}/>
-             {openEdit.is && <EditClientForm openEdit={openEdit.is} currentUser={openEdit.data} closeEditHandler={closeEditHandler}/>}
+             <AlertBox openAlert={openAlert.value} handleCloseAlert={handleCloseAlert} onAction={handleDeleteRecord}/>
+             {openEdit.is && 
+                    <EditClientForm 
+                            openEdit={openEdit.is} 
+                            currentUser={openEdit.data} 
+                            closeEditHandler={closeEditHandler}/>
+              }
               <div style={{ marginBottom: '20px' }}>
                 <TopNavText navText={['Management','>','Manage Client']} summaryText="View all clients"/>   
              </div>
@@ -152,11 +192,28 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                   Search              
                           </Button>    
                  </ActionArea> 
+                 <MultipleAction>
+                        <Checkbox
+                            onChange={multipleSelectHandler}
+                            color = "primary"
+                            inputProps={{ 'aria-label': 'secondary checkbox' }}
+                        />
+                       <Typography component='span' variant='subtitle2' color='textPrimary'
+                                    style={{ fontSize: '15px',padding:'3px 0px', fontWeight: 400,  lineHeight: '18px' }}>
+                         Check All              
+                        </Typography>    
+                        {/* <Button style={{ marginLeft : '10px', textTransform : 'capitalize' }}
+                                variant='contained' 
+                                color='secondary' 
+                                size='small' 
+                                disableElevation>Delete All</Button>                           */}
+                 </MultipleAction>    
                  {!loading ? 
                  <StyledTableContainer>
                             <Table aria-label="simple table">
                                 <TableHead>
                                 <TableRow>
+                                    <TableCell>Check</TableCell>
                                     <TableCell>Name</TableCell>
                                     <TableCell align="center">Address</TableCell>
                                     <TableCell align="center">Status</TableCell>
@@ -170,7 +227,15 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                         clients[0] &&
                                         clients.map(client =>
                                                   <TableRow key ={client.id}>
+                                                        <TableCell>
+                                                            <Checkbox
+                                                                onChange = {checkboxHandler.bind(null, client.id)}
+                                                                color = "primary"
+                                                                inputProps={{ 'aria-label': 'secondary checkbox' }}
+                                                            />
+                                                         </TableCell>   
                                                         <TableCell component="th" scope="row">
+                                                      
                                                             <StyledName>
                                                                 <Avatar style={{ marginRight: '15px' }}>
                                                                     {client.name.charAt(0).toUpperCase()}
@@ -201,7 +266,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading }) {
                                                                         </StyledIconButton>
                                                                 </Tooltip>
                                                                 <Tooltip title="Delete">
-                                                                        <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox}>
+                                                                        <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox.bind(null,client.id)}>
                                                                             <DeleteIcon/>
                                                                         </StyledIconButton>
                                                                 </Tooltip>
@@ -238,6 +303,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         loadClient : (page, orderType, status) => dispatch(loadClient(page, orderType, status)),
+        deleteClient : id => dispatch(deleteClient(id))
     }
 }
 
@@ -335,5 +401,11 @@ const PaginationContainer = styled.div`
    background: #fff;
    display: flex;
    justify-content: center;
+   align-items : center;
+`
+
+const MultipleAction = styled.div`
+   padding: 10px 20px 0px;
+   display : flex;
    align-items : center;
 `

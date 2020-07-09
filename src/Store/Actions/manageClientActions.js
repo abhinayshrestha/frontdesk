@@ -1,4 +1,5 @@
-import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS, UPDATE_CLIENT_SUCCESS, UPDATING_CLIENT } from './actionTypes';
+import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS, UPDATE_CLIENT_SUCCESS, UPDATING_CLIENT, 
+        DELETING_CLIENT, DELETE_CLIENT_SUCCESS } from './actionTypes';
 import axios from 'axios';
 
 const addingClient = () => {
@@ -64,22 +65,57 @@ const updatingClient = () => {
     }
 }
 
-const updateClientSuccess = data => {
+const updateClientSuccess = (data, id) => {
     return {
-        type : UPDATE_CLIENT_SUCCESS
+        type : UPDATE_CLIENT_SUCCESS,
+        id : id,
+        data : data
     }
 }
 
 export const updateClient = (data, id) => {
-    console.log(id);
+    let newData = {};
+    newData.id = id;
+    for(let [key, value] of Object.entries(data)) {
+        if(value !== '' && value !== null) {
+            newData[key] = value;
+        }
+    }
     return dispatch => {
         dispatch(updatingClient());
-        axios.patch(`/updateClientInfo/${id}`, data)
-            .then(res => {
-                console.log(res);
+        axios.patch(`/updateClientInfo/${id}`, newData)
+            .then(_ => {
+                dispatch(updateClientSuccess(data, id));
             })
             .catch(err => {
-                console.log(err);
+                console.log(err.response);
             })
+    }
+}
+
+const deletingClient = () => {
+    return {
+        type : DELETING_CLIENT
+    }
+}
+
+const deleteClientSuccess = id => {
+    return {
+        type : DELETE_CLIENT_SUCCESS,
+        id : id
+    }
+}
+
+export const deleteClient = id => {
+    console.log(id);
+    return dispatch => {
+        dispatch(deletingClient());
+        // axios.delete(`/deleteClientInfo/${[id]}`)
+        //      .then(_ => {
+        //          deleteClientSuccess(id);
+        //      })   
+        //      .catch(err => {
+        //          console.log(err.response);
+        //      })
     }
 }

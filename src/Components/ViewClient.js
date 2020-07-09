@@ -214,7 +214,7 @@ function ViewClient({ templateMsg }) {
                                            </Button>   
                                 </Title> 
                               </StyledPaper>  
-                        <StyledPaper style={{ marginTop : '20px' }}>
+                        <StyledPaper style={{ marginTop : '7px' }}>
                             <div style={{ padding: '15px' }}>
                                 <Typography component='div' variant='body1' style={{ fontSize: '14px' }}>
                                      <Box color='gray'>Remember, if the record is deleted permanently it cannot be brought back.</Box>

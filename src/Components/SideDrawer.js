@@ -9,7 +9,6 @@ import Navigation from './Navigation';
 function SideDrawer({ showDrawer }) {
 
     const drawerVariants = {
-        start : { width : 0, x: -260 },
         end : { 
              width : 260,
              x: 0,
