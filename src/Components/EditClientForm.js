@@ -59,7 +59,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
         let phoneError = false;
         let statusError = false;
         const emailRegx = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-        if(name.value && name.value.length >= 1) {
+        if(name.value.length >= 1) {
             nameError = false;
         }
         else{
@@ -115,20 +115,20 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
     }, [success, closeEditHandler])
 
     useEffect(() => {
-        setName({...inputType['name'], value: currentUser.name}); 
-        setStatus({...inputType['status'], value: currentUser.status});
+        setName({...inputType['name'], value: currentUser.name || ''}); 
+        setStatus({...inputType['status'], value: currentUser.status || ''});
         setSelectedDate({ ...inputType['date'],value: currentUser.date });
-        setEmail({ ...inputType['email'], value: currentUser.email  });
-        setPhone({  ...inputType['phone'], value: currentUser.phone  });
-        setAddress({...inputType['address'], value: currentUser.address});
-        setAge({ ...inputType['age'], value: currentUser.age });
-        setRemark({ ...inputType['remark'], value: currentUser.remark });
-        setGender({ ...inputType['gender'], value: currentUser.gender });
-        setAcademic({ ...inputType['academic'], value: currentUser.academic });
-        setHeight({ ...inputType['height'], value: currentUser.height });
-        setWeight({ ...inputType['weight'], value: currentUser.weight });
-        setMartial({ ...inputType['martial'], value: currentUser.maritalStatus });
-    }, [inputType, currentUser])
+        setEmail({ ...inputType['email'], value: currentUser.email || ''  });
+        setPhone({  ...inputType['phone'], value: currentUser.phone || ''  });
+        setAddress({...inputType['address'], value: currentUser.address || ''});
+        setAge({ ...inputType['age'], value: currentUser.age || '' });
+        setRemark({ ...inputType['remark'], value: currentUser.remark || '' });
+        setGender({ ...inputType['gender'], value: currentUser.gender || '' });
+        setAcademic({ ...inputType['academic'], value: currentUser.academic || ''});
+        setHeight({ ...inputType['height'], value: currentUser.height || '' });
+        setWeight({ ...inputType['weight'], value: currentUser.weight || '' });
+        setMartial({ ...inputType['martial'], value: currentUser.maritalStatus || '' });
+    }, [inputType, currentUser, academic.value])
 
     return (
         <Backdrop open={openEdit} handleClose={closeEditHandler}>
@@ -400,7 +400,6 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
 }
 
 const mapStateToProps = state => {
-    console.log(state.manageClientReducer.updateClientLoader)
     return {
         loading: state.manageClientReducer.updateClientLoader,
         success: state.manageClientReducer.success,

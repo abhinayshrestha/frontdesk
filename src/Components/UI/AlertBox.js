@@ -1,21 +1,23 @@
 import React from 'react'
-import { Typography, Paper, Button } from '@material-ui/core';
+import { Typography, Paper, Button, CircularProgress } from '@material-ui/core';
 import Backdrop from './Backdrop';
 import styled from 'styled-components';
 
-function AlertBox({ openAlert, handleCloseAlert, onAction }) {
+function AlertBox({ openAlert, handleCloseAlert, onAction, text, loading }) {
 
     return (
         <Backdrop open={openAlert}>
              <AlertContainer elevation={0}>
                     <Typography variant='body2'>
-                          Are you sure you want to delete this record permanently?
+                         {text}
                     </Typography> 
                     <div className='actionArea'>
-                        <StyledButton size='small' variant='contained' color='secondary' onClick={() => onAction()} disableElevation>
+                        {loading ? <CircularProgress size={25}/> : null}
+                        <StyledButton size='small' variant='contained' color='secondary' disabled={loading}
+                                        onClick={() => onAction()} disableElevation>
                             Delete
                          </StyledButton>   
-                         <StyledButton size='small' variant='contained' disableElevation onClick={handleCloseAlert}>
+                         <StyledButton size='small' variant='contained' disableElevation onClick={handleCloseAlert} disabled={loading}>
                             Cancel
                          </StyledButton> 
                     </div>       
@@ -33,6 +35,7 @@ const AlertContainer = styled(Paper)`
        padding-top: 20px;
        display : flex;
        justify-content : flex-end;
+       align-items : center;
    }
 `
 const StyledButton = styled(Button)`

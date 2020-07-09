@@ -14,7 +14,7 @@ import axios from 'axios';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)))
-axios.defaults.baseURL = 'http://front-desk-api.herokuapp.com';
+axios.defaults.baseURL = 'https://front-desk-api.herokuapp.com';
 
 const theme = createMuiTheme({
     palette : {

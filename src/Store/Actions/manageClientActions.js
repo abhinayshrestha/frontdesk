@@ -107,15 +107,14 @@ const deleteClientSuccess = id => {
 }
 
 export const deleteClient = id => {
-    console.log(id);
     return dispatch => {
         dispatch(deletingClient());
-        // axios.delete(`/deleteClientInfo/${[id]}`)
-        //      .then(_ => {
-        //          deleteClientSuccess(id);
-        //      })   
-        //      .catch(err => {
-        //          console.log(err.response);
-        //      })
+        axios.delete(`/deleteClientInfo/${id}`)
+             .then(res => {
+                dispatch(deleteClientSuccess(id));
+             })   
+             .catch(err => {
+                 console.log(err.response);
+             })
     }
 }

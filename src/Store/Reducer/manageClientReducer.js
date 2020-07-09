@@ -69,19 +69,21 @@ const manageClientReducer = (state= initState, action) => {
                             deleteClientLoader: true,
                         }      
           case DELETE_CLIENT_SUCCESS : 
-                        const deleteIndex = state.clients.findIndex(client => client.id === action.id);
-                        const newArr = [...state.clients];
-                        newArr.splice(deleteIndex, 1);
+                        let newArr = [...state.clients]  
+                        newArr = newArr.filter(function(obj) {
+                            return !this.has(obj.id);
+                        }, new Set(action.id.map(id => id)));
+                        console.log(newArr);
                         return {
-                            ...state,
-                            deleteClientLoader : false, 
-                            clients : [...newArr],
-                            success : {
+                                ...state,
+                                clients : [...newArr],
+                                deleteClientLoader : false,
+                                success : {
                                 ...state.success,
                                 value : true,
                                 label : 'Record deleted successfully.'
-                            }
-                        }                                    
+                                }
+                            }   
           case SET_SUCCESS : 
                     return {
                         ...state,

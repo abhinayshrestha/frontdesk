@@ -21,7 +21,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { loadClient, deleteClient } from '../Store/Actions/manageClientActions';
 import EditClientForm from './EditClientForm';
 
-function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient }) {
+function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, success, deleteLoader }) {
 
     const [status, setStatus] = useState({ value: 'all' });
     const [orderBy, setOrderBy] = useState({ value: 'Date', options: ["Date", "Name", "Last 10 days"] });
@@ -29,9 +29,10 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
     const [openAlert, setOpenAlert] = useState({ value : false, id : '' });
     const [page, setPage] = useState(1);
     const [openEdit, setOpenEdit] = useState({ is: false, data: {} });
-    const [checkedUser, setCheckedUser] = useState([]);
+    const [checkedUser, setCheckedUser] = useState({});
     const { pathname } = useLocation();
-    const [checkBoxValue, setCheckBoxValue] = useState(undefined);
+    const [checkAll, setCheckAll] = useState(false);
+    const [showDeleteAllBtn, setShowDeleteAllBtn] = useState(false);
 
     const openEditHandler = (user) => {
          setOpenEdit({ ...openEdit, is : true , data: { ...user } })
@@ -57,6 +58,10 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
         setOpenAlert({ ...openAlert, value : true, id : id });
     }
 
+    const multipleDeleteHandler = () => {
+        setOpenAlert({ ...openAlert, value: true, id : false })
+    }
+
     const handleCloseAlert = () => {
         setOpenAlert({ ...openAlert, value : false, id : '' });
     }
@@ -72,35 +77,34 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
       }
 
       const checkboxHandler = (id, event) => {
-        if(event.target.checked){
-            setCheckedUser(checkedUser.concat(id));
-        }
-        else {
-            const checkedArray = [...checkedUser];
-            const i = checkedArray.indexOf(id);
-            checkedArray.splice(i, 1);
-            setCheckedUser([...checkedArray]);
-        }  
+            setCheckedUser({
+                ...checkedUser,
+                [id] : event.target.checked
+            })   
       }
 
-      useEffect(() => {
-          setCheckedUser([]);
-      }, [page])
-
-      useEffect(() => {
-         console.log(checkedUser);
-      }, [checkedUser])
-
       const handleDeleteRecord = () => {
-         deleteClient(openAlert.id);
+            if(openAlert.id){
+                deleteClient([openAlert.id]);
+            }
+            else {
+                let ids = []
+                for(let id in checkedUser){
+                    if(checkedUser[id]){
+                        ids.push(Number(id));
+                    }
+                }
+                deleteClient(ids);
+            }
       }
 
       const multipleSelectHandler = e => {
-            if(e.target.checked) {
-                setCheckBoxValue(true);
-            }    
-            else {setCheckBoxValue(undefined);}
-
+            const newCheckedUser = {...checkedUser}
+            for(let id in checkedUser){
+                 Object.assign(newCheckedUser, { [id] : e.target.checked })   
+            }
+            setCheckAll(e.target.checked);
+            setCheckedUser({ ...newCheckedUser });
       }
 
       const usePreviousStatus = (value) => {
@@ -117,8 +121,10 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
         });
         return ref.current;
       }
-     const statusVal = usePreviousStatus(status.value)
+     
+      const statusVal = usePreviousStatus(status.value)
      const orderTyp = usePreviousOrderType(orderType.value)
+    
      useEffect(() => {
          if( statusVal === status.value && orderTyp === orderType.value ) {
             loadClient(page, orderType.value, status.value);
@@ -128,9 +134,42 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
          }
       }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp])
 
+      useEffect(() => {
+         const checkedBox = {};
+         clients.map(client => Object.assign(checkedBox, { [client.id] : false }));
+         setCheckedUser({...checkedBox});
+      }, [clients, setCheckedUser])
+
+      useEffect(() => {
+          let i = 0;
+          for(let key in checkedUser){
+              if(checkedUser[key] === true){
+                  ++i;
+              }
+          }
+          if(i>0){
+            setShowDeleteAllBtn(true);
+          }
+          else{
+            setShowDeleteAllBtn(false);
+            setCheckAll(false);
+          }
+      }, [checkedUser])
+
+      useEffect(() => {
+          if(success.value){
+             setOpenAlert(prev => { return { ...prev, value : false, id : '' } });
+          }
+      }, [success, setOpenAlert])
+
     return (
         <>
-             <AlertBox openAlert={openAlert.value} handleCloseAlert={handleCloseAlert} onAction={handleDeleteRecord}/>
+             <AlertBox 
+                    openAlert={openAlert.value} 
+                    handleCloseAlert={handleCloseAlert} 
+                    onAction={handleDeleteRecord}
+                    loading = {deleteLoader}
+                    text={`Are you sure you want to delete ${openAlert.id === false ? Object.keys(checkedUser).filter(key => checkedUser[key] === true).length : 'this' } record permanently?`}/>
              {openEdit.is && 
                     <EditClientForm 
                             openEdit={openEdit.is} 
@@ -194,7 +233,8 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
                  </ActionArea> 
                  <MultipleAction>
                         <Checkbox
-                            onChange={multipleSelectHandler}
+                            checked = {checkAll}
+                            onChange = {multipleSelectHandler}
                             color = "primary"
                             inputProps={{ 'aria-label': 'secondary checkbox' }}
                         />
@@ -202,11 +242,13 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
                                     style={{ fontSize: '15px',padding:'3px 0px', fontWeight: 400,  lineHeight: '18px' }}>
                          Check All              
                         </Typography>    
-                        {/* <Button style={{ marginLeft : '10px', textTransform : 'capitalize' }}
+                      {showDeleteAllBtn && <Button style={{ marginLeft : '10px', textTransform : 'capitalize' }}
                                 variant='contained' 
                                 color='secondary' 
                                 size='small' 
-                                disableElevation>Delete All</Button>                           */}
+                                onClick={multipleDeleteHandler}
+                                disableElevation>Delete All
+                        </Button>}                        
                  </MultipleAction>    
                  {!loading ? 
                  <StyledTableContainer>
@@ -228,11 +270,12 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
                                         clients.map(client =>
                                                   <TableRow key ={client.id}>
                                                         <TableCell>
-                                                            <Checkbox
+                                                            {<Checkbox
+                                                                checked = {checkedUser[client.id] || false}
                                                                 onChange = {checkboxHandler.bind(null, client.id)}
                                                                 color = "primary"
                                                                 inputProps={{ 'aria-label': 'secondary checkbox' }}
-                                                            />
+                                                            />}
                                                          </TableCell>   
                                                         <TableCell component="th" scope="row">
                                                       
@@ -294,9 +337,11 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient })
 
 const mapStateToProps = state => {
     return {
+        deleteLoader: state.manageClientReducer.deleteClientLoader,
         statusOpt : state.settingReducer.entryForm.status.options,
         clients : state.manageClientReducer.clients,
         loading : state.manageClientReducer.loadClientLoader,
+        success: state.manageClientReducer.success, 
     }
 }
 

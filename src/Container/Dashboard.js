@@ -18,7 +18,7 @@ import { SET_SUCCESS } from '../Store/Actions/actionTypes';
 
 function Dashboard({ success, setSuccess }) {
  
-    const [showDrawer, setShowDrawer] = useState(false); 
+    const [showDrawer, setShowDrawer] = useState(true); 
     const [openAddBtn, setOpenAddBtn] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
 
