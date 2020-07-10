@@ -29,7 +29,7 @@ const formVariants = {
     }
 }
 
-function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, updateClient, success, loading }) {
+function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, updateClient, success, loading, editSuccessHandle }) {
 
     const [status, setStatus] = useState({});
     const [selectedDate, setSelectedDate] = useState({});
@@ -113,10 +113,19 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
     }
 
     useEffect(() => {
+        console.log(success.value);
         if(success.value) {
             closeEditHandler();
         }
     }, [success, closeEditHandler])
+
+    useEffect(() => {
+        if(success.value) {
+            if(editSuccessHandle){
+                editSuccessHandle(currentUser.id, name.value, email.value, status.value)
+            }
+        }
+    }, [success, currentUser.id , name.value, email.value, status.value, editSuccessHandle])
 
     useEffect(() => {
         setName({...inputType['name'], value: currentUser.name || ''}); 

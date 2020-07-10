@@ -25,7 +25,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
 
     const [searchBox, setSearchBox] = useState('');
     const [status, setStatus] = useState({ value: 'all' });
-    const [orderBy, setOrderBy] = useState({ value: 'Date', options: ["Date", "Name", "Last 10 days"] });
+    const [orderBy, setOrderBy] = useState({ value: 0, options: [{ value : 0, label : 'Today' },{ value : 7, label : 'Last 7 days' }, { value : 30, label : 'Last 30 days' }] });
     const [orderType, setOrderType] = useState({ value: 'asc', options:[{value:'asc', label : "Ascending"},{value:'desc', label : "Descending"}]});
     const [openAlert, setOpenAlert] = useState({ value : false, id : '' });
     const [page, setPage] = useState(1);
@@ -79,7 +79,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
           setCheckedUser([]);
           setPage(1);
           getTotalPages(status.value);
-          loadClient(1, orderType.value, status.value, searchBox);
+          loadClient(1, orderType.value, status.value, searchBox, orderBy.value);
       }
 
       const checkboxHandler = (id, event) => {
@@ -113,14 +113,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
             setCheckedUser({ ...newCheckedUser });
       }
 
-      const usePreviousStatus = (value) => {
-        const ref = useRef();
-        useEffect(() => {
-          ref.current = value;
-        });
-        return ref.current;
-      }
-      const usePreviousOrderType = (value) => {
+      const usePrevious = (value) => {
         const ref = useRef();
         useEffect(() => {
           ref.current = value;
@@ -128,17 +121,18 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
         return ref.current;
       }
      
-      const statusVal = usePreviousStatus(status.value)
-     const orderTyp = usePreviousOrderType(orderType.value)
+     const statusVal = usePrevious(status.value)
+     const orderTyp = usePrevious(orderType.value)
+     const prevOrderBy = usePrevious(orderBy.value)
     
      useEffect(() => {
-         if( statusVal === status.value && orderTyp === orderType.value ) {
-            loadClient(page, orderType.value, status.value, searchBox);
+         if( statusVal === status.value && orderTyp === orderType.value && prevOrderBy === orderBy.value ) {
+            loadClient(page, orderType.value, status.value, searchBox, orderBy.value);
          }
          else if( statusVal === undefined ) {
-            loadClient(1 , orderType.value, status.value, '');
+            loadClient(1 , orderType.value, status.value, '',  orderBy.value);
          }
-      }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp, searchBox])
+      }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp, searchBox, orderBy.value, prevOrderBy])
 
       useEffect(() => {
          const checkedBox = {};
@@ -212,15 +206,15 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
                                     </Select>
                           </StyledFormControl>
                           <StyledFormControl  variant='outlined' margin='dense'>
-                                    <InputLabel id="demo-simple-select-outlined-label">Order by</InputLabel>
+                                    <InputLabel id="demo-simple-select-outlined-label">Date</InputLabel>
                                     <Select labelId="demo-simple-select-outlined-label"
                                             id="demo-simple-select-outlined"
                                             value={orderBy.value}
                                             onChange={handleOrderBy}
-                                            label="Order by"
+                                            label="Date"
                                             >
                                             {
-                                                orderBy.options.map((opt, i) => <MenuItem value={opt} key={i}>{opt}</MenuItem>)
+                                                orderBy.options.map((opt, i) => <MenuItem value={opt.value} key={i}>{opt.label}</MenuItem>)
                                             }    
                                     </Select>
                           </StyledFormControl>
@@ -367,7 +361,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        loadClient : (page, orderType, status, searchBox) => dispatch(loadClient(page, orderType, status, searchBox)),
+        loadClient : (page, orderType, status, searchBox, days) => dispatch(loadClient(page, orderType, status, searchBox, days)),
         deleteClient : id => dispatch(deleteClient(id)),
         getTotalPages : status => dispatch(getTotalPages(status))
     }

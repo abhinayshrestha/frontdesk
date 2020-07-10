@@ -1,4 +1,5 @@
-import { LOADING_RECENT_SUMMARY, LOADING_RECENT_SUMMARY_SUCCESS, DELETING_RECENT_SUMMARY, DELETING_RECENT_SUMMARY_SUCCESS } from './actionTypes';
+import { LOADING_RECENT_SUMMARY, LOADING_RECENT_SUMMARY_SUCCESS, DELETING_RECENT_SUMMARY, DELETING_RECENT_SUMMARY_SUCCESS,
+        EDIT_RECENT_SUMMARY_SUCCESS } from './actionTypes';
 import axios from 'axios';
 
 const loadingRecentSummary = () => {
@@ -43,13 +44,18 @@ const deletingRecentSummarySuccess = id => {
 export const deleteRecentSummary = id => {
     return dispatch => {
         dispatch(deletingRecentSummary());
-        dispatch(deletingRecentSummarySuccess(id));
-        // axios.delete(`/deleteClientInfo/${id}`)
-        //      .then(_ => {
-        //          dispatch(deletingRecentSummarySuccess(id))
-        //      })
-        //      .catch(err => {
-        //          console.log(err.response);
-        //      })   
+        axios.delete(`/deleteClientInfo/${id}`)
+             .then(_ => {
+                 dispatch(deletingRecentSummarySuccess(id))
+             })
+             .catch(err => {
+                 console.log(err.response);
+             })   
+    }
+}
+
+export const editRecentSummarySuccess = (id, name, email, status) => {
+    return dispatch => {
+        dispatch({ type : EDIT_RECENT_SUMMARY_SUCCESS, id, name, email, status })
     }
 }

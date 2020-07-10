@@ -42,9 +42,8 @@ const loadClientSuccess = data => {
     }
 }
 
-export const loadClient = (page, orderType, status, nameFilter) => {
-    console.log(nameFilter);
-    let url = `/clientInfo?page=${page}&order=${orderType}&status=${status}&nameFilter=${nameFilter}`;
+export const loadClient = (page, orderType, status, nameFilter, days) => {
+    let url = `/clientInfo?page=${page}&order=${orderType}&status=${status}&nameFilter=${nameFilter}&days=${days}`;
     return dispatch => {
         dispatch(loadingClient())
         axios.get(url)

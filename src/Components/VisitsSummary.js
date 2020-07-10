@@ -11,13 +11,12 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import  { connect } from 'react-redux';
-import  { loadRecentSummary, deleteRecentSummary } from '../Store/Actions/dashboardActions';
+import  { loadRecentSummary, deleteRecentSummary, editRecentSummarySuccess } from '../Store/Actions/dashboardActions';
 import  { Link } from 'react-router-dom';
 import AlertBox from './UI/AlertBox';
 import EditClientForm from './EditClientForm';
 
-
-function VisitsSummary({ loadRecentSummary, visitors, loader, deleteRecentSummary, success, deleteLoader }) {
+function VisitsSummary({ loadRecentSummary, visitors, loader, deleteRecentSummary, editRecentSummarySuccess, deleteLoader }) {
 
     const [openEdit, setOpenEdit] = useState({ is: false, data: {} });
     const [openAlert, setOpenAlert] = useState({ value : false, id : '' });
@@ -39,13 +38,18 @@ function VisitsSummary({ loadRecentSummary, visitors, loader, deleteRecentSummar
     }
 
     const handleDeleteRecord = () => {
-        deleteRecentSummary([openAlert.id])
-        console.log(openAlert.id);
+        deleteRecentSummary([openAlert.id]);
+        setOpenAlert({ ...openAlert, value : false, id : '' });
+     }
+
+     const editSuccessHandle = (id, name, email, status) => {
+        editRecentSummarySuccess(id, name, email, status);
      }
 
     useEffect(() => {
         loadRecentSummary();
     }, [loadRecentSummary])
+
 
     return (
         <Container>
@@ -57,6 +61,7 @@ function VisitsSummary({ loadRecentSummary, visitors, loader, deleteRecentSummar
                     text={`Are you sure you want to delete this record permanently?`}/>
              {openEdit.is && 
                     <EditClientForm 
+                            editSuccessHandle = {editSuccessHandle}
                             openEdit={openEdit.is} 
                             currentUser={openEdit.data} 
                             closeEditHandler={closeEditHandler}/>
@@ -152,13 +157,15 @@ const mapStateToProps = state => {
     return {
         visitors : state.dashboardReducer.recentVisitors,
         loader : state.dashboardReducer.loadingRecentVisitors,
+        deleteLoader : state.dashboardReducer.deletingRecentVisitors,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
         loadRecentSummary : () => dispatch(loadRecentSummary()),
-        deleteRecentSummary : id => dispatch(deleteRecentSummary(id))
+        deleteRecentSummary : id => dispatch(deleteRecentSummary(id)),
+        editRecentSummarySuccess : (id, name, email, status) => dispatch(editRecentSummarySuccess(id, name, email, status))
     }
 }
 
