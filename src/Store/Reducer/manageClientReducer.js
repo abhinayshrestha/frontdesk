@@ -1,5 +1,5 @@
 import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, SET_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS, UPDATING_CLIENT, UPDATE_CLIENT_SUCCESS,
-        DELETING_CLIENT, DELETE_CLIENT_SUCCESS } from '../Actions/actionTypes';
+        DELETING_CLIENT, DELETE_CLIENT_SUCCESS, GET_TOTAL_PAGES } from '../Actions/actionTypes';
 
 const initState = {
     clients : [],
@@ -9,7 +9,8 @@ const initState = {
     currentPage : 1,
     loadClientLoader : false,
     updateClientLoader : false,
-    deleteClientLoader : false
+    deleteClientLoader : false,
+    totalPages : 0
 }
 
 const manageClientReducer = (state= initState, action) => {
@@ -84,6 +85,11 @@ const manageClientReducer = (state= initState, action) => {
                                 label : 'Record deleted successfully.'
                                 }
                             }   
+          case GET_TOTAL_PAGES : 
+                            return {
+                                ...state,
+                                totalPages : action.data
+                            }
           case SET_SUCCESS : 
                     return {
                         ...state,

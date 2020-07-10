@@ -1,9 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components';
-import { Typography, Divider, IconButton, Avatar, Tooltip } from '@material-ui/core';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { Typography, Divider, IconButton, Avatar, Tooltip, CircularProgress } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -13,285 +10,159 @@ import TableRow from '@material-ui/core/TableRow';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import  { connect } from 'react-redux';
+import  { loadRecentSummary, deleteRecentSummary } from '../Store/Actions/dashboardActions';
+import  { Link } from 'react-router-dom';
+import AlertBox from './UI/AlertBox';
+import EditClientForm from './EditClientForm';
 
 
-function VisitsSummary() {
+function VisitsSummary({ loadRecentSummary, visitors, loader, deleteRecentSummary, success, deleteLoader }) {
 
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [openEdit, setOpenEdit] = useState({ is: false, data: {} });
+    const [openAlert, setOpenAlert] = useState({ value : false, id : '' });
 
-    const open = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const openEditHandler = (user) => {
+        setOpenEdit({ ...openEdit, is : true , data: { ...user } })
+    }
 
-    const close = () => {
-        setAnchorEl(null);
-    };
+    const closeEditHandler = () => {
+        setOpenEdit({ is: false, data : {} });
+    }
+
+    const openAlertBox = id => {
+        setOpenAlert({ ...openAlert, value : true, id : id });
+    }
+
+    const handleCloseAlert = () => {
+        setOpenAlert({ ...openAlert, value : false, id : '' });
+    }
+
+    const handleDeleteRecord = () => {
+        deleteRecentSummary([openAlert.id])
+        console.log(openAlert.id);
+     }
+
+    useEffect(() => {
+        loadRecentSummary();
+    }, [loadRecentSummary])
 
     return (
         <Container>
+             <AlertBox 
+                    openAlert={openAlert.value} 
+                    handleCloseAlert={handleCloseAlert} 
+                    onAction={handleDeleteRecord}
+                    loading = {deleteLoader}
+                    text={`Are you sure you want to delete this record permanently?`}/>
+             {openEdit.is && 
+                    <EditClientForm 
+                            openEdit={openEdit.is} 
+                            currentUser={openEdit.data} 
+                            closeEditHandler={closeEditHandler}/>
+              }
              <Title>
                 <Typography variant='subtitle2' color='textPrimary' style={{ fontSize: '16px' }}>
                      Recently Visited
-                </Typography>    
-                <StyledButton onClick={open}>
-                        <MoreVertIcon />
-                </StyledButton>
-                <Menu
-                        id="simple-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={close}
-                        >
-                        <MenuItem onClick={close}>Today</MenuItem>
-                        <MenuItem onClick={close}>1 week ago</MenuItem>
-                        <MenuItem onClick={close}>30 days abgo</MenuItem>
-                </Menu>
+                </Typography> 
              </Title>    
              <Divider />
-             <div className='chartContainer'>
+       { !loader ?     
+           visitors[0] ?
+            <div className='chartContainer'>
                 <TableContainer>
                         <Table aria-label="simple table">
                             <TableHead>
                             <TableRow>
                                 <TableCell>Name</TableCell>
                                 <TableCell align="center">Action</TableCell>
-                                <TableCell align="center">Remark</TableCell>
+                                <TableCell align="center">Status</TableCell>
                                 <TableCell align="center">Date</TableCell>
                             </TableRow>
                             </TableHead>
                             <TableBody>
-                                <TableRow >
-                                    <TableCell component="th" scope="row">
-                                        <StyledName>
-                                            <Avatar style={{ marginRight: '15px' }}>
-                                                A
-                                            </Avatar>   
-                                            <Typography variant='subtitle2'>
-                                                    Abhinay Shrestha<br/>
-                                                    <Typography variant='body2' color='textSecondary'>
-                                                        abhinay.shrestha11@gmail.com
-                                                    </Typography>
-                                            </Typography>   
-                                        </StyledName>  
-                                    </TableCell>
-                                    <TableCell align="center">
-                                           <div style = {{ display : 'flex' }}>
-                                            <Tooltip title="View or Message">
-                                                    <StyledIconButton aria-label="View">
-                                                        <VisibilityIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Edit">
-                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                        <EditIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                    <StyledIconButton aria-label="Delete" color='secondary'>
-                                                        <DeleteIcon/>
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            </div>
-                                    </TableCell>
-                                    <TableCell align="center">For Admission</TableCell>
-                                    <TableCell align="center">19 June, 2020</TableCell>
-                                </TableRow>
-                                <TableRow >
-                                    <TableCell component="th" scope="row">
-                                        <StyledName>
-                                            <Avatar style={{ marginRight: '15px' }}>
-                                                A
-                                            </Avatar>   
-                                            <Typography variant='subtitle2'>
-                                                    Abhinay Shrestha<br/>
-                                                    <Typography variant='body2' color='textSecondary'>
-                                                        abhinay.shrestha11@gmail.com
-                                                    </Typography>
-                                            </Typography>   
-                                        </StyledName>  
-                                    </TableCell>
-                                    <TableCell align="center">
-                                           <div style = {{ display : 'flex' }}>
-                                            <Tooltip title="View or Message">
-                                                    <StyledIconButton aria-label="View">
-                                                        <VisibilityIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Edit">
-                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                        <EditIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                    <StyledIconButton aria-label="Delete" color='secondary'>
-                                                        <DeleteIcon/>
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            </div>
-                                    </TableCell>
-                                    <TableCell align="center">For Admission</TableCell>
-                                    <TableCell align="center">19 June, 2020</TableCell>
-                                </TableRow>
-                                <TableRow >
-                                    <TableCell component="th" scope="row">
-                                        <StyledName>
-                                            <Avatar style={{ marginRight: '15px' }}>
-                                                A
-                                            </Avatar>   
-                                            <Typography variant='subtitle2'>
-                                                    Abhinay Shrestha<br/>
-                                                    <Typography variant='body2' color='textSecondary'>
-                                                        abhinay.shrestha11@gmail.com
-                                                    </Typography>
-                                            </Typography>   
-                                        </StyledName>  
-                                    </TableCell>
-                                    <TableCell align="center">
-                                           <div style = {{ display : 'flex' }}>
-                                            <Tooltip title="View or Message">
-                                                    <StyledIconButton aria-label="View">
-                                                        <VisibilityIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Edit">
-                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                        <EditIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                    <StyledIconButton aria-label="Delete" color='secondary'>
-                                                        <DeleteIcon/>
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            </div>
-                                    </TableCell>
-                                    <TableCell align="center">For Admission</TableCell>
-                                    <TableCell align="center">19 June, 2020</TableCell>
-                                </TableRow>
-                                <TableRow >
-                                    <TableCell component="th" scope="row">
-                                        <StyledName>
-                                            <Avatar style={{ marginRight: '15px' }}>
-                                                A
-                                            </Avatar>   
-                                            <Typography variant='subtitle2'>
-                                                    Abhinay Shrestha<br/>
-                                                    <Typography variant='body2' color='textSecondary'>
-                                                        abhinay.shrestha11@gmail.com
-                                                    </Typography>
-                                            </Typography>   
-                                        </StyledName>  
-                                    </TableCell>
-                                    <TableCell align="center">
-                                           <div style = {{ display : 'flex' }}>
-                                            <Tooltip title="View or Message">
-                                                    <StyledIconButton aria-label="View">
-                                                        <VisibilityIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Edit">
-                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                        <EditIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                    <StyledIconButton aria-label="Delete" color='secondary'>
-                                                        <DeleteIcon/>
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            </div>
-                                    </TableCell>
-                                    <TableCell align="center">For Admission</TableCell>
-                                    <TableCell align="center">19 June, 2020</TableCell>
-                                </TableRow>
-                                <TableRow >
-                                    <TableCell component="th" scope="row">
-                                        <StyledName>
-                                            <Avatar style={{ marginRight: '15px' }}>
-                                                A
-                                            </Avatar>   
-                                            <Typography variant='subtitle2'>
-                                                    Abhinay Shrestha<br/>
-                                                    <Typography variant='body2' color='textSecondary'>
-                                                        abhinay.shrestha11@gmail.com
-                                                    </Typography>
-                                            </Typography>   
-                                        </StyledName>  
-                                    </TableCell>
-                                    <TableCell align="center">
-                                           <div style = {{ display : 'flex' }}>
-                                            <Tooltip title="View or Message">
-                                                    <StyledIconButton aria-label="View">
-                                                        <VisibilityIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Edit">
-                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                        <EditIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                    <StyledIconButton aria-label="Delete" color='secondary'>
-                                                        <DeleteIcon/>
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            </div>
-                                    </TableCell>
-                                    <TableCell align="center">For Admission</TableCell>
-                                    <TableCell align="center">19 June, 2020</TableCell>
-                                </TableRow><TableRow >
-                                    <TableCell component="th" scope="row">
-                                        <StyledName>
-                                            <Avatar style={{ marginRight: '15px' }}>
-                                                A
-                                            </Avatar>   
-                                            <Typography variant='subtitle2'>
-                                                    Abhinay Shrestha<br/>
-                                                    <Typography variant='body2' color='textSecondary'>
-                                                        abhinay.shrestha11@gmail.com
-                                                    </Typography>
-                                            </Typography>   
-                                        </StyledName>  
-                                    </TableCell>
-                                    <TableCell align="center">
-                                           <div style = {{ display : 'flex' }}>
-                                            <Tooltip title="View or Message">
-                                                    <StyledIconButton aria-label="View">
-                                                        <VisibilityIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Edit">
-                                                    <StyledIconButton aria-label="Edit" color='primary'>
-                                                        <EditIcon />
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete">
-                                                    <StyledIconButton aria-label="Delete" color='secondary'>
-                                                        <DeleteIcon/>
-                                                    </StyledIconButton>
-                                            </Tooltip>
-                                            </div>
-                                    </TableCell>
-                                    <TableCell align="center">For Admission</TableCell>
-                                    <TableCell align="center">19 June, 2020</TableCell>
-                                </TableRow>
-                                
+                                {
+                                    visitors[0] && visitors.map(client =>
+                                        <TableRow key ={client.id}>
+                                                <TableCell component="th" scope="row">
+                                                    <StyledName>
+                                                        <Avatar style={{ marginRight: '15px' }}>
+                                                            {client.name.charAt(0).toUpperCase()}
+                                                        </Avatar>   
+                                                        <Typography variant='subtitle2'>
+                                                                {client.name}<br/>
+                                                                <Typography variant='body2' color='textSecondary'>
+                                                                    {client.email}
+                                                                </Typography>
+                                                        </Typography>   
+                                                    </StyledName>  
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <div style = {{ display : 'flex' }}>
+                                                        <Tooltip title="View or Message">
+                                                                <StyledIconButton aria-label="View">
+                                                                    <VisibilityIcon />
+                                                                </StyledIconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Edit">
+                                                                <StyledIconButton aria-label="Edit" color='primary'  onClick={openEditHandler.bind(null, client)}>
+                                                                    <EditIcon />
+                                                                </StyledIconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Delete">
+                                                                <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox.bind(null,client.id)}>
+                                                                    <DeleteIcon/>
+                                                                </StyledIconButton>
+                                                        </Tooltip>
+                                                        </div>
+                                                </TableCell>
+                                                <TableCell align="center">{client.status}</TableCell>
+                                                <TableCell align="center">{new Date(client.createdAt).toDateString()}</TableCell>
+                                            </TableRow>
+                                        )
+                                }
                             </TableBody>
                         </Table>
                 </TableContainer>
                 
                 <div style={{ height: '50px', display: 'flex', justifyContent : 'center', alignItems : 'center' }}>
-                       <Typography variant = 'subtitle2' color='primary' style={{ fontWeight: '400', fontSize: '15px' }}>
+                      <Link to='/manage-clients' style={{ textDecoration : 'none' }}> 
+                        <Typography variant = 'subtitle2' color='primary' 
+                                    style={{ fontWeight: '400', fontSize: '15px' }}>
                                 See All...
-                        </Typography>                
+                        </Typography>
+                      </Link>                
                  </div> 
-             </div>   
+             </div> 
+             :
+             <Empty>
+                    <Typography gutterBottom variant='subtitle2' style={{ color:'#bbb', fontSize: '15px',padding:'3px 0px', fontWeight: 400,  lineHeight: '18px' }}>
+                        No records found. You can click "+" icon to create one.
+                    </Typography>  
+            </Empty>
+             : 
+             <div style={{ height: '100px', display : 'flex', justifyContent : 'center',  alignItems :'center' }}>
+                <CircularProgress /> 
+            </div>} 
         </Container>
     )
 }
 
-export default VisitsSummary;
+const mapStateToProps = state => {
+    return {
+        visitors : state.dashboardReducer.recentVisitors,
+        loader : state.dashboardReducer.loadingRecentVisitors,
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        loadRecentSummary : () => dispatch(loadRecentSummary()),
+        deleteRecentSummary : id => dispatch(deleteRecentSummary(id))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(VisitsSummary);
 
 const Container = styled.div`
      box-shadow: 0 0 14px 0 rgba(53,64,82,.05);
@@ -341,14 +212,6 @@ const Title = styled.div`
     box-sizing : border-box;
     position: relative;
 `
-const StyledButton = styled(IconButton)`
-    &&& {
-        position: absolute;
-        top: 50%;
-        right: 20px;
-        transform: translateY(-50%);
-    }
-`
 const StyledName = styled.div`
    display: flex;
    align-items : center;
@@ -364,4 +227,10 @@ const StyledIconButton = styled(IconButton)`
      &&& {
         padding : 8px;
      }
+`
+const Empty = styled.div`
+    padding : 20px;
+    display : flex;
+    justify-content : center;
+    align-items : center; 
 `

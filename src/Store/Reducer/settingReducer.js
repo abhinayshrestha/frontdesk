@@ -4,7 +4,7 @@ import { UPDATING_INPUT_SETTING_SUCCESS, UPDATING_INPUT_SETTING, ADD_TEMPLATE_SU
 const initState =  {
     entryForm : {
         name : { label: 'Name', value: '' , options: false, checked: true, error: false, errMsg: 'Enter atleast a character' },
-        academic :  { label: 'Academic', value: '' , options: ['Masters','Bachelor','High School','SLC'], checked: false, error: false, errMsg: 'Enter academic qualification' },
+        academic :  { label: 'Academic', value: '' , options: ['Masters','Bachelor','High School','SLC'], checked: true, error: false, errMsg: 'Enter academic qualification' },
         status : { label: 'Status', value: '' , options: ['Booked','Pending','Cancelled','Others'], checked: true, error: false, errMsg: 'Enter a status' },
         email : { label: 'Email', value: '' , options: false, checked: true, error: false, errMsg: 'Enter valid email address' },
         phone : { label: 'Phone no.', value: '' , options: false, checked: true, error: false, errMsg: 'Enter valid phone number' },
@@ -13,9 +13,9 @@ const initState =  {
         age :  { label: 'Age', value: '' , options: [15, 16, 17], checked: true, error: false, errMsg: 'Enter a age' },
         date : { label: 'Date', value: new Date() , options: false, checked: true, error: false, errMsg: 'Enter a date' },
         remark : { label: 'Remark', value: '' , options: false, checked: true, error: false, errMsg: 'Enter remarks' },
-        height : { label: 'Height', value: '' , options: [5.1, 5.2, 5.3], checked: false, error: false, errMsg: 'Enter height' },
-        gender : { label: 'Gender', value: '' , options: ['Male', 'Female','Others'], checked: false, error: false, errMsg: 'Enter gender' },
-        martial : { label: 'Martial Status', value: '' , options: ['Single','Married','Others'], checked: false, error: false, errMsg: 'Enter martial status' }
+        height : { label: 'Height', value: '' , options: [5.1, 5.2, 5.3], checked: true, error: false, errMsg: 'Enter height' },
+        gender : { label: 'Gender', value: '' , options: ['Male', 'Female','Others'], checked: true, error: false, errMsg: 'Enter gender' },
+        martial : { label: 'Martial Status', value: '' , options: ['Single','Married','Others'], checked: true, error: false, errMsg: 'Enter martial status' }
     },
     saveEntryLoader : false,
     templateMsg : [

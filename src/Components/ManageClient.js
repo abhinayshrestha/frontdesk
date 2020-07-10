@@ -18,14 +18,15 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { connect } from 'react-redux';
 import AlertBox from './UI/AlertBox';
 import { NavLink, useLocation } from 'react-router-dom';
-import { loadClient, deleteClient } from '../Store/Actions/manageClientActions';
+import { loadClient, deleteClient, getTotalPages } from '../Store/Actions/manageClientActions';
 import EditClientForm from './EditClientForm';
 
-function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, success, deleteLoader }) {
+function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, success, deleteLoader, getTotalPages, totalPages }) {
 
+    const [searchBox, setSearchBox] = useState('');
     const [status, setStatus] = useState({ value: 'all' });
     const [orderBy, setOrderBy] = useState({ value: 'Date', options: ["Date", "Name", "Last 10 days"] });
-    const [orderType, setOrderType] = useState({ value: 'desc', options:[{value:'asc', label : "Ascending"},{value:'desc', label : "Descending"}]});
+    const [orderType, setOrderType] = useState({ value: 'asc', options:[{value:'asc', label : "Ascending"},{value:'desc', label : "Descending"}]});
     const [openAlert, setOpenAlert] = useState({ value : false, id : '' });
     const [page, setPage] = useState(1);
     const [openEdit, setOpenEdit] = useState({ is: false, data: {} });
@@ -33,6 +34,10 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
     const { pathname } = useLocation();
     const [checkAll, setCheckAll] = useState(false);
     const [showDeleteAllBtn, setShowDeleteAllBtn] = useState(false);
+
+    const textSearchHandler = e => {
+        setSearchBox(e.target.value);
+    }
 
     const openEditHandler = (user) => {
          setOpenEdit({ ...openEdit, is : true , data: { ...user } })
@@ -73,7 +78,8 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
       const searchHandler = () => {
           setCheckedUser([]);
           setPage(1);
-          loadClient(1, orderType.value, status.value);
+          getTotalPages(status.value);
+          loadClient(1, orderType.value, status.value, searchBox);
       }
 
       const checkboxHandler = (id, event) => {
@@ -127,12 +133,12 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
     
      useEffect(() => {
          if( statusVal === status.value && orderTyp === orderType.value ) {
-            loadClient(page, orderType.value, status.value);
+            loadClient(page, orderType.value, status.value, searchBox);
          }
          else if( statusVal === undefined ) {
-            loadClient(1 , orderType.value, status.value);
+            loadClient(1 , orderType.value, status.value, '');
          }
-      }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp])
+      }, [loadClient, page, orderType.value, status.value, statusVal, orderTyp, searchBox])
 
       useEffect(() => {
          const checkedBox = {};
@@ -162,6 +168,12 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
           }
       }, [success, setOpenAlert])
 
+      useEffect(() => {
+        if( statusVal === undefined ) {
+            getTotalPages(status.value)
+         }
+      }, [getTotalPages, status.value, statusVal])
+
     return (
         <>
              <AlertBox 
@@ -183,7 +195,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
                 <ActionArea>
                         <div className='search'>
                               <SearchIcon/>
-                              <input type='text' placeholder='Search....'/>
+                              <input type='text' placeholder='Search....' onChange={textSearchHandler} value={searchBox}/>
                          </div>   
                          <StyledFormControl  variant='outlined' margin='dense' >
                                     <InputLabel id="demo-simple-select-outlined-label">Status</InputLabel>
@@ -251,84 +263,91 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
                         </Button>}                        
                  </MultipleAction>    
                  {!loading ? 
-                 <StyledTableContainer>
-                            <Table aria-label="simple table">
-                                <TableHead>
-                                <TableRow>
-                                    <TableCell>Check</TableCell>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell align="center">Address</TableCell>
-                                    <TableCell align="center">Status</TableCell>
-                                    <TableCell align="center">Phone</TableCell>
-                                    <TableCell align="center">Action</TableCell>
-                                    <TableCell align="center">Date</TableCell>
-                                </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {
-                                        clients[0] &&
-                                        clients.map(client =>
-                                                  <TableRow key ={client.id}>
-                                                        <TableCell>
-                                                            {<Checkbox
-                                                                checked = {checkedUser[client.id] || false}
-                                                                onChange = {checkboxHandler.bind(null, client.id)}
-                                                                color = "primary"
-                                                                inputProps={{ 'aria-label': 'secondary checkbox' }}
-                                                            />}
-                                                         </TableCell>   
-                                                        <TableCell component="th" scope="row">
-                                                      
-                                                            <StyledName>
-                                                                <Avatar style={{ marginRight: '15px' }}>
-                                                                    {client.name.charAt(0).toUpperCase()}
-                                                                </Avatar>   
-                                                                <Typography variant='subtitle2'>
-                                                                        {client.name}<br/>
-                                                                        <Typography variant='body2' color='textSecondary'>
-                                                                        {client.email}
-                                                                        </Typography>
-                                                                </Typography>   
-                                                            </StyledName>    
-                                                        </TableCell>
-                                                        <TableCell align="center">{client.address}</TableCell>
-                                                        <TableCell align="center">{client.status}</TableCell>
-                                                        <TableCell align="center">{client.phone}</TableCell>
-                                                        <TableCell align="center">
-                                                            <div style={{ display : 'flex', justifyContent: 'center' }}>
-                                                                <Tooltip title="View or Message">
-                                                                    <NavLink to={`${pathname}/abhinay`}>
-                                                                            <StyledIconButton aria-label="View">
-                                                                                <VisibilityIcon />
-                                                                            </StyledIconButton>
-                                                                    </NavLink>  
-                                                                </Tooltip>
-                                                                <Tooltip title="Edit">
-                                                                        <StyledIconButton aria-label="Edit" color='primary' onClick={openEditHandler.bind(null, client)}>
-                                                                            <EditIcon />
-                                                                        </StyledIconButton>
-                                                                </Tooltip>
-                                                                <Tooltip title="Delete">
-                                                                        <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox.bind(null,client.id)}>
-                                                                            <DeleteIcon/>
-                                                                        </StyledIconButton>
-                                                                </Tooltip>
-                                                             </div>   
-                                                        </TableCell>
-                                                        <TableCell align="center">{new Date(client.createdAt).toDateString()}</TableCell>
-                                                </TableRow>
-                                            )
-                                    }
-                                </TableBody>
-                            </Table>
-                    </StyledTableContainer> 
+                    clients[0] ?
+                        <StyledTableContainer>
+                                    <Table aria-label="simple table">
+                                        <TableHead>
+                                        <TableRow>
+                                            <TableCell>Check</TableCell>
+                                            <TableCell>Name</TableCell>
+                                            <TableCell align="center">Address</TableCell>
+                                            <TableCell align="center">Status</TableCell>
+                                            <TableCell align="center">Phone</TableCell>
+                                            <TableCell align="center">Action</TableCell>
+                                            <TableCell align="center">Date</TableCell>
+                                        </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {
+                                                
+                                                clients.map(client =>
+                                                        <TableRow key ={client.id}>
+                                                                <TableCell>
+                                                                    {<Checkbox
+                                                                        checked = {checkedUser[client.id] || false}
+                                                                        onChange = {checkboxHandler.bind(null, client.id)}
+                                                                        color = "primary"
+                                                                        inputProps={{ 'aria-label': 'secondary checkbox' }}
+                                                                    />}
+                                                                </TableCell>   
+                                                                <TableCell component="th" scope="row">
+                                                            
+                                                                    <StyledName>
+                                                                        <Avatar style={{ marginRight: '15px' }}>
+                                                                            {client.name.charAt(0).toUpperCase()}
+                                                                        </Avatar>   
+                                                                        <Typography variant='subtitle2'>
+                                                                                {client.name}<br/>
+                                                                                <Typography variant='body2' color='textSecondary'>
+                                                                                {client.email}
+                                                                                </Typography>
+                                                                        </Typography>   
+                                                                    </StyledName>    
+                                                                </TableCell>
+                                                                <TableCell align="center">{client.address}</TableCell>
+                                                                <TableCell align="center">{client.status}</TableCell>
+                                                                <TableCell align="center">{client.phone}</TableCell>
+                                                                <TableCell align="center">
+                                                                    <div style={{ display : 'flex', justifyContent: 'center' }}>
+                                                                        <Tooltip title="View or Message">
+                                                                            <NavLink to={`${pathname}/abhinay`}>
+                                                                                    <StyledIconButton aria-label="View">
+                                                                                        <VisibilityIcon />
+                                                                                    </StyledIconButton>
+                                                                            </NavLink>  
+                                                                        </Tooltip>
+                                                                        <Tooltip title="Edit">
+                                                                                <StyledIconButton aria-label="Edit" color='primary' onClick={openEditHandler.bind(null, client)}>
+                                                                                    <EditIcon />
+                                                                                </StyledIconButton>
+                                                                        </Tooltip>
+                                                                        <Tooltip title="Delete">
+                                                                                <StyledIconButton aria-label="Delete" color='secondary' onClick={openAlertBox.bind(null,client.id)}>
+                                                                                    <DeleteIcon/>
+                                                                                </StyledIconButton>
+                                                                        </Tooltip>
+                                                                    </div>   
+                                                                </TableCell>
+                                                                <TableCell align="center">{new Date(client.createdAt).toDateString()}</TableCell>
+                                                        </TableRow>
+                                                    )
+                                        
+                                            }
+                                        </TableBody>
+                                    </Table>
+                            </StyledTableContainer> 
+                    : <Empty>
+                            <Typography gutterBottom variant='subtitle2' style={{ color:'#bbb', fontSize: '15px',padding:'3px 0px', fontWeight: 400,  lineHeight: '18px' }}>
+                                 No records found. You can click "+" icon to create one.
+                            </Typography>  
+                    </Empty>
                     :
                     <div style={{ height : '100px', display: 'flex', justifyContent : 'center', alignItems : 'center', width :'100%' }}>
                            <CircularProgress />
                      </div>   
                    }
                  <PaginationContainer>
-                        <Pagination count={10} page={page} color="primary" onChange={handlePageChange}/>
+                        <Pagination count={totalPages} page={page} color="primary" onChange={handlePageChange}/>
                   </PaginationContainer>   
             </Container>   
         </>
@@ -342,13 +361,15 @@ const mapStateToProps = state => {
         clients : state.manageClientReducer.clients,
         loading : state.manageClientReducer.loadClientLoader,
         success: state.manageClientReducer.success, 
+        totalPages: state.manageClientReducer.totalPages, 
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        loadClient : (page, orderType, status) => dispatch(loadClient(page, orderType, status)),
-        deleteClient : id => dispatch(deleteClient(id))
+        loadClient : (page, orderType, status, searchBox) => dispatch(loadClient(page, orderType, status, searchBox)),
+        deleteClient : id => dispatch(deleteClient(id)),
+        getTotalPages : status => dispatch(getTotalPages(status))
     }
 }
 
@@ -453,4 +474,10 @@ const MultipleAction = styled.div`
    padding: 10px 20px 0px;
    display : flex;
    align-items : center;
+`
+const Empty = styled.div`
+    padding : 20px;
+    display : flex;
+    justify-content : center;
+    align-items : center; 
 `

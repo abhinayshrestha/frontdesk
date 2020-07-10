@@ -53,6 +53,10 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
         setStatus({...status, value: event.target.value});
     }
 
+    const handleAcademic = event => {
+        setAcademic({...academic, value : event.target.value})
+    }
+
     const handleUpdateRecord = () => {
         let nameError = false;
         let emailError = false;
@@ -128,7 +132,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
         setHeight({ ...inputType['height'], value: currentUser.height || '' });
         setWeight({ ...inputType['weight'], value: currentUser.weight || '' });
         setMartial({ ...inputType['martial'], value: currentUser.maritalStatus || '' });
-    }, [inputType, currentUser, academic.value])
+    }, [inputType, currentUser])
 
     return (
         <Backdrop open={openEdit} handleClose={closeEditHandler}>
@@ -333,7 +337,7 @@ function AddClientForm({ openEdit, closeEditHandler, inputType, currentUser, upd
                                                     <Select labelId="demo-simple-select-outlined-label"
                                                             id="demo-simple-select-outlined"
                                                             value={academic.value}
-                                                            onChange={e => setAcademic({...academic, value: e.target.value})}
+                                                            onChange={handleAcademic}
                                                             label="Academic Qualification"
                                                             >
                                                             {

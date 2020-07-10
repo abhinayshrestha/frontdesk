@@ -47,8 +47,7 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
     const [martial, setMartial] = useState({});
 
     const handleDateChange = (date) => {
-        const newDate = date.toISOString().slice(0, date.toISOString().lastIndexOf('T'));  
-        setSelectedDate({ ...selectedDate, value: newDate });
+        setSelectedDate({ ...selectedDate, value: date });
     };
     const handleChangeStatus = event => {
         setStatus({...status, value: event.target.value});
@@ -91,6 +90,7 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
             setStatus({ ...status, error: statusError });
         }
         else {
+            const newDate = selectedDate.value.toISOString().slice(0, selectedDate.value.toISOString().lastIndexOf('T'));  
             const data = {
                 name: name.value,
                 age: age.value,
@@ -99,9 +99,9 @@ function AddClientForm({ openAddBtn, handleCloseAddBtn, addClient, loading, succ
                 address: address.value,
                 status: status.value,
                 remark: remark.value,
-                martialStatus : martial.value,
+                maritalStatus : martial.value,
                 height: height.value,
-                date : selectedDate.value,
+                date : newDate,
                 gender : gender.value,
                 academic : academic.value
             }

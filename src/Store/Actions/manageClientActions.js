@@ -1,5 +1,5 @@
 import { ADDING_CLIENT, ADD_CLIENT_SUCCESS, LOADING_CLIENT, LOAD_CLIENT_SUCCESS, UPDATE_CLIENT_SUCCESS, UPDATING_CLIENT, 
-        DELETING_CLIENT, DELETE_CLIENT_SUCCESS } from './actionTypes';
+        DELETING_CLIENT, DELETE_CLIENT_SUCCESS, GET_TOTAL_PAGES } from './actionTypes';
 import axios from 'axios';
 
 const addingClient = () => {
@@ -17,14 +17,14 @@ const addClientSuccess = () => {
 export const addClient = data => {
     return dispatch => {
         dispatch(addingClient());
-        axios.post('/clientInfo', data)
+        axios.post('/insertClientInfo', data)
            .then(res => {
                if(res.status === 200){
                  dispatch(addClientSuccess());
                }
            })
            .catch(err => {
-               console.log(err);
+               console.log(err.response);
            })
     }
 }
@@ -42,11 +42,9 @@ const loadClientSuccess = data => {
     }
 }
 
-export const loadClient = (page, orderType, status) => {
-    let url = `/clientInfo?page=${page}&order=${orderType}&status=${status}`;
-    if(status === 'all'){
-        url = `/clientInfo?page=${page}&order=${orderType}`;
-    }
+export const loadClient = (page, orderType, status, nameFilter) => {
+    console.log(nameFilter);
+    let url = `/clientInfo?page=${page}&order=${orderType}&status=${status}&nameFilter=${nameFilter}`;
     return dispatch => {
         dispatch(loadingClient())
         axios.get(url)
@@ -116,5 +114,17 @@ export const deleteClient = id => {
              .catch(err => {
                  console.log(err.response);
              })
+    }
+}
+
+export const getTotalPages = status => {
+    return dispatch => {
+        axios.get(`/totalPages?status=${status}`)
+           .then(res => {
+               dispatch({ type : GET_TOTAL_PAGES, data : res.data })
+           })
+           .catch(err => {
+               console.log(err)
+           })
     }
 }
