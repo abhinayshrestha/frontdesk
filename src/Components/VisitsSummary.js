@@ -58,6 +58,7 @@ function VisitsSummary({ loadRecentSummary, visitors, loader, deleteRecentSummar
                     handleCloseAlert={handleCloseAlert} 
                     onAction={handleDeleteRecord}
                     loading = {deleteLoader}
+                    isDelete
                     text={`Are you sure you want to delete this record permanently?`}/>
              {openEdit.is && 
                     <EditClientForm 

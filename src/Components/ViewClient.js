@@ -1,14 +1,16 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import TopNavText from './UI/TopNavText';
 import styled from 'styled-components';
-import { Grid, Paper, Typography, Divider, Button, Chip, TextField, Box, IconButton, Tooltip, MenuItem, Menu } from '@material-ui/core';
+import { Grid, Paper, Typography, Divider, Button, Chip, TextField, IconButton, Tooltip, MenuItem, Menu } from '@material-ui/core';
 import PublishIcon from '@material-ui/icons/Publish';
 import SendIcon from '@material-ui/icons/Send';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
+import { useParams } from 'react-router-dom';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { connect } from 'react-redux';
-
+import axios from 'axios';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 function ViewClient({ templateMsg }) {
 
@@ -18,6 +20,9 @@ function ViewClient({ templateMsg }) {
     const [anchorE2, setAnchorE2] = useState(null);
     const [attachment, setAttachment] = useState([]);
     const fileRef = useRef(null);
+    const params = useParams();
+    const [info, setInfo] = useState([]);
+    const [loader, setLoader] = useState(true);
     const openTimelyOpt = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -46,98 +51,69 @@ function ViewClient({ templateMsg }) {
         setAttachment([...newFiles]);
     }
 
+    useEffect(() => {
+        axios.get(`/getClientInfo/${params.id}`)
+             .then(res => {
+                 const infoArr = Object.keys(res.data)
+                                .map(key =>{ 
+                                    if(key === 'createdAt'){
+                                        return { key : 'Entry Date', value : new Date(res.data[key]).toDateString() }
+                                    }
+                                    return { key : key, value : res.data[key] }
+                                })
+                                .filter(inf => inf.value!== null && inf.value !== '' && inf.value !== 0 && inf.key !== 'id' )
+                 setInfo([...infoArr]);   
+                 setLoader(false);          
+             }) 
+             .catch(err => {
+                 console.log(err);
+             })
+    }, [params.id])
+
     return (
             <>
                  <div style={{ marginBottom: '20px' }}>
-                        <TopNavText navText={['Management','>','Manage Client','>', 'View Client']} summaryText="Abhinay Shrestha"/>   
+                 <TopNavText navText={[{label :'Dashboard', to : '/'},{label : 'Manage Client', to : '/manage-clients'}, { label : 'Client Detail', to : '/manage-clients/abhinay' }]} 
+                            summaryText='Client Detail'>
+                        <DeleteButton variant="contained" color='secondary'
+                                            startIcon={<DeleteIcon />} 
+                                            disableElevation
+                                            size='small'
+                                            >
+                            Move to Trash
+                        </DeleteButton>    
+                 </TopNavText>                  
                  </div>
                  <Grid container spacing={1}>
                        <Grid item xs={12} sm={12} md={4} lg={4}> 
-                             <StyledPaper>
+                            {  !loader ?
+                                <StyledPaper>
                                     <Title>
                                         <Typography variant='subtitle2' style={{ fontSize: '16px' }}>
                                              Client Info
                                         </Typography>    
                                     </Title>     
                                     <Divider/>
-                                    <InfoContainer container>
-                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
-                                               <Typography  variant='subtitle2' style={{ fontSize: '14px' }}>
-                                                Name
-                                               </Typography> 
-                                            </Grid>
-                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
-                                                <Typography  variant='body1' style={{ fontSize: '14px' }}>
-                                                     Abhinay Shrestha   
-                                                 </Typography> 
-                                             </Grid>   
-                                     </InfoContainer>  
-                                    <Divider/>
-                                    <InfoContainer container>
-                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
-                                               <Typography  variant='subtitle2' style={{ fontSize: '14px' }}>
-                                                Email
-                                               </Typography> 
-                                            </Grid>
-                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
-                                                <Typography  variant='body1' style={{ fontSize: '14px' }} noWrap>
-                                                     abhinay.shrestha11@gmail.com 
-                                                 </Typography> 
-                                             </Grid>   
-                                     </InfoContainer>  
-                                    <Divider/>
-                                    <InfoContainer container>
-                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
-                                               <Typography  variant='subtitle2' style={{ fontSize: '14px' }}>
-                                                Phone no.
-                                               </Typography> 
-                                            </Grid>
-                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
-                                                <Typography  variant='body1' style={{ fontSize: '14px' }}>
-                                                     9816593608  
-                                                 </Typography> 
-                                             </Grid>   
-                                     </InfoContainer>  
-                                    <Divider/>
-                                    <InfoContainer container>
-                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
-                                               <Typography  variant='subtitle2' style={{ fontSize: '14px' }}>
-                                                 Address
-                                               </Typography> 
-                                            </Grid>
-                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
-                                                <Typography  variant='body1' style={{ fontSize: '14px' }}>
-                                                     Chabahil 
-                                                 </Typography> 
-                                             </Grid>   
-                                     </InfoContainer>  
-                                    <Divider/>
-                                    <InfoContainer container>
-                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
-                                               <Typography  variant='subtitle2' style={{ fontSize: '14px' }}>
-                                                 Academic
-                                               </Typography> 
-                                            </Grid>
-                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
-                                                <Typography  variant='body1' style={{ fontSize: '14px' }}>
-                                                     Bachelor Degree 
-                                                 </Typography> 
-                                             </Grid>   
-                                     </InfoContainer>  
-                                    <Divider/>
-                                    <InfoContainer container>
-                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
-                                               <Typography  variant='subtitle2' style={{ fontSize: '14px' }}>
-                                                 Status
-                                               </Typography> 
-                                            </Grid>
-                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
-                                                <Typography  variant='body1' style={{ fontSize: '14px' }}>
-                                                     Booked 
-                                                 </Typography> 
-                                             </Grid>   
-                                     </InfoContainer>  
-                                    <Divider/>
+                                    {
+                                       info && info.map(userInfo => 
+                                            <React.Fragment key={userInfo.key}>
+                                                    <InfoContainer container>
+                                                        <Grid item xs={4} sm={4} md={4} lg={4}> 
+                                                            <Typography  variant='subtitle2' style={{ fontSize: '14px', textTransform : 'capitalize' }}>
+                                                                {userInfo.key}
+                                                            </Typography> 
+                                                            </Grid>
+                                                            <Grid item xs={8} sm={8} md={8} lg={8}> 
+                                                                <Typography  variant='body1' style={{ fontSize: '14px' }}>
+                                                                    {userInfo.value}   
+                                                                </Typography> 
+                                                            </Grid>   
+                                                    </InfoContainer>  
+                                                    <Divider/>
+                                            </React.Fragment>
+                                            )
+                                    }
+                                    
                                     <Title style ={{ display: 'flex', justifyContent : 'flex-end' }}>
                                            <Button variant="contained" color='primary' 
                                                   startIcon={<PublishIcon />} 
@@ -146,7 +122,13 @@ function ViewClient({ templateMsg }) {
                                                  Export   
                                            </Button>     
                                      </Title>   
-                              </StyledPaper>      
+                              </StyledPaper> 
+                            :     
+                        <Loader>      
+                            <Skeleton animation="wave" height='60px' width='60px' variant="circle"/>
+                            <Skeleton animation="wave" height='30px'/>
+                            <Skeleton animation="wave" height='150px'/>
+                        </Loader>}
                         </Grid>
                         <Grid item xs={12} sm={12} md={4} lg={4}> 
                              <StyledPaper>
@@ -213,23 +195,7 @@ function ViewClient({ templateMsg }) {
                                                  Message 
                                            </Button>   
                                 </Title> 
-                              </StyledPaper>  
-                        <StyledPaper style={{ marginTop : '7px' }}>
-                            <div style={{ padding: '15px' }}>
-                                <Typography component='div' variant='body1' style={{ fontSize: '14px' }}>
-                                     <Box color='gray'>Remember, if the record is deleted permanently it cannot be brought back.</Box>
-                                </Typography>   
-                                <div style={{ display: 'flex', justifyContent : 'flex-end', marginTop : '10px' }}>
-                                        
-                                            <Button variant="contained" color='secondary'
-                                                  startIcon={<DeleteIcon />} 
-                                                  disableElevation
-                                                  size='small'>
-                                                 Delete Record 
-                                           </Button>   
-                                </div> 
-                             </div> 
-                         </StyledPaper>   
+                              </StyledPaper>   
                         </Grid>
                         <Grid item xs={12} sm={12} md={4} lg={4}> 
                         <StyledPaper>
@@ -384,4 +350,21 @@ const StyledTextField = styled(TextField)`
         }
         `}
         }
+`
+
+const Loader = styled.div`
+     padding : 0px 10px;
+     &&& .MuiSkeleton-root {
+        transform: scale(1, 1);
+        margin-bottom : 10px;
+     }
+`
+
+const DeleteButton = styled(Button)`
+    &&& {
+       position: absolute;
+       top : 50%;
+       right: 0px;
+       transform : translateY(-50%); 
+    }
 `

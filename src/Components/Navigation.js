@@ -10,6 +10,7 @@ import PeopleAltOutlinedIcon from '@material-ui/icons/PeopleAltOutlined';
 import MailOutlineOutlinedIcon from '@material-ui/icons/MailOutlineOutlined';
 import AlternateEmailOutlinedIcon from '@material-ui/icons/AlternateEmailOutlined';
 import AddAlertOutlinedIcon from '@material-ui/icons/AddAlertOutlined';
+import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import Collapse from '@material-ui/core/Collapse';
@@ -111,6 +112,14 @@ function Navigation() {
                         <ListItemText primary="Reminders" />
                     </ListItem>
                 </StyledNavLink>
+                <TrashNavLink to='/trash' activeClassName='activeNav'> 
+                    <ListItem button >
+                        <ListItemIcon>
+                            <DeleteOutlineOutlinedIcon fontSize='small'/>
+                        </ListItemIcon>
+                        <ListItemText primary="Trash"/>
+                    </ListItem>
+                </TrashNavLink>
             </StyledList>           
         </div>
     )
@@ -170,4 +179,26 @@ const StyledNavLink = styled(NavLink)`
                 color : ${theme.palette.primary.main};
             }
     `}
+`
+const TrashNavLink = styled(NavLink)`
+        ${({ theme }) => `
+        &&& {
+                color: #546e7a;
+                text-decoration: none;
+                &.activeNav {
+                    color : ${theme.palette.secondary.main};
+                    }
+                }
+                &.activeNav .MuiSvgIcon-root{
+                    color : ${theme.palette.secondary.main};
+                }
+                &.activeNav .MuiButtonBase-root {
+                    background : rgba(244, 67, 54, 0.1);
+                }
+                &&& .MuiButtonBase-root {
+                    &:hover {
+                        background : rgba(244, 67, 54, 0.1);
+                    } 
+                }
+        `}
 `

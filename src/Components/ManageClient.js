@@ -175,7 +175,8 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
                     handleCloseAlert={handleCloseAlert} 
                     onAction={handleDeleteRecord}
                     loading = {deleteLoader}
-                    text={`Are you sure you want to delete ${openAlert.id === false ? Object.keys(checkedUser).filter(key => checkedUser[key] === true).length : 'this' } record permanently?`}/>
+                    isDelete = {true}
+                    text={`Are you sure you want to move ${openAlert.id === false ? Object.keys(checkedUser).filter(key => checkedUser[key] === true).length : 'this' } record to trash?`}/>
              {openEdit.is && 
                     <EditClientForm 
                             openEdit={openEdit.is} 
@@ -183,7 +184,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
                             closeEditHandler={closeEditHandler}/>
               }
               <div style={{ marginBottom: '20px' }}>
-                <TopNavText navText={['Management','>','Manage Client']} summaryText="View all clients"/>   
+                <TopNavText navText={[{label :'Dashboard', to : '/'},{label : 'Manage Client', to : '/manage-clients'}]} summaryText="View all clients"/>   
              </div>
             <Container>
                 <ActionArea>
@@ -304,7 +305,7 @@ function ManageClient({ statusOpt, loadClient, clients, loading, deleteClient, s
                                                                 <TableCell align="center">
                                                                     <div style={{ display : 'flex', justifyContent: 'center' }}>
                                                                         <Tooltip title="View or Message">
-                                                                            <NavLink to={`${pathname}/abhinay`}>
+                                                                            <NavLink to={`${pathname}/${client.id}`}>
                                                                                     <StyledIconButton aria-label="View">
                                                                                         <VisibilityIcon />
                                                                                     </StyledIconButton>

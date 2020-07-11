@@ -12,13 +12,15 @@ import Brightness7 from '@material-ui/icons/Brightness7';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import FeedbackIcon from '@material-ui/icons/Feedback';
 import Tooltip from '@material-ui/core/Tooltip';
-import logo from '../Assets/whiteLogo.png';
+import logo from '../Assets/logo.png';
 import { connect } from 'react-redux';
 import { logout } from '../Store/Actions/authAction';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import { NavLink } from 'react-router-dom';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import { TOGGLE_THEME } from '../Store/Actions/actionTypes';
 
-function TopMenuBar({ handleDrawer, logout }) {
+function TopMenuBar({ handleDrawer, logout, isDark, toggleTheme }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     
@@ -34,26 +36,34 @@ function TopMenuBar({ handleDrawer, logout }) {
     return (
             <StyledAppBar position='static' elevation={0}>
                     <Toolbar>
-                            <IconButton color='inherit' edge="start" aria-label="menu" onClick={handleDrawer}>
-                                <MenuIcon />
+                            <IconButton edge="start" aria-label="menu" onClick={handleDrawer}>
+                                <MenuIcon/>
                             </IconButton>
-                            <Typography color="textPrimary" variant="h5" style={{ flex: '1', marginLeft: '20px',  lineHeight : '23px' }}>
+                            <Typography variant="h5" style={{ flex: '1', marginLeft: '20px',  lineHeight : '23px' }}>
                                  <img src={logo} alt='' style={{ maxWidth : '60px' }}/>
                             </Typography>
                                 <Tooltip title="Setting">
                                      <NavLink to='/setting' style={{ textDecoration: 'none', color: '#fff' }}>
-                                        <StyledIconButton color='inherit' aria-label="menu">
+                                        <StyledIconButton  aria-label="menu">
                                             <SettingsOutlinedIcon />
                                         </StyledIconButton>
                                      </NavLink>   
                                 </Tooltip> 
-                                <Tooltip title="Switch Theme">
-                                        <StyledIconButton color='inherit' aria-label="menu">
-                                            <Brightness7 />
-                                        </StyledIconButton>
-                               </Tooltip> 
+                               {isDark ? 
+                                    <Tooltip title="Switch to light theme">
+                                                <StyledIconButton aria-label="menu" onClick={() => toggleTheme(false)}>
+                                                    <Brightness7 />
+                                                </StyledIconButton>
+                                    </Tooltip> 
+                               :
+                                    <Tooltip title="Switch to dark theme">
+                                                <StyledIconButton  aria-label="menu" onClick={() => toggleTheme(true)}>
+                                                    <Brightness4Icon/>
+                                                </StyledIconButton>
+                                    </Tooltip>
+                               }
                                 <Tooltip title="Logout">
-                                    <StyledIconButton color='inherit' aria-label="menu" onClick={() =>  logout()}>
+                                    <StyledIconButton aria-label="menu" onClick={() =>  logout()}>
                                         <ExitToAppIcon />
                                     </StyledIconButton>
                                 </Tooltip>
@@ -61,7 +71,6 @@ function TopMenuBar({ handleDrawer, logout }) {
                                     aria-label="account of current user"
                                     aria-controls="menu-appbar"
                                     aria-haspopup="true"
-                                    color='inherit'
                                     onClick={handleMenu}
                                 >
                                     <MoreVertIcon />
@@ -92,18 +101,25 @@ function TopMenuBar({ handleDrawer, logout }) {
     )
 }
 
-const mapDispatchToProps = dispatch => {
+const mapStateToProps = state => {
     return {
-        logout : () => dispatch(logout())
+        isDark: state.authReducer.isDark
     }
 }
 
-export default connect(null, mapDispatchToProps)(TopMenuBar);
+const mapDispatchToProps = dispatch => {
+    return {
+        logout : () => dispatch(logout()),
+        toggleTheme : val => dispatch({ type: TOGGLE_THEME, val: val })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopMenuBar);
 
 const StyledAppBar = styled(AppBar)`
      &&& {
          border-bottom : 1px solid rgba(0, 0, 0, 0.12);  
-         background : #3949ab;
+         ${({ theme }) => `background : ${theme.palette.background.paper};`}
      }
 `
 

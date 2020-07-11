@@ -3,8 +3,8 @@ import { Typography, Paper, Button, CircularProgress } from '@material-ui/core';
 import Backdrop from './Backdrop';
 import styled from 'styled-components';
 
-function AlertBox({ openAlert, handleCloseAlert, onAction, text, loading }) {
-
+function AlertBox({ openAlert, handleCloseAlert, onAction, text, loading, isDelete }) {
+    console.log(isDelete);
     return (
         <Backdrop open={openAlert}>
              <AlertContainer elevation={0}>
@@ -13,11 +13,11 @@ function AlertBox({ openAlert, handleCloseAlert, onAction, text, loading }) {
                     </Typography> 
                     <div className='actionArea'>
                         {loading ? <CircularProgress size={25}/> : null}
-                        <StyledButton size='small' variant='contained' color='secondary' disabled={loading}
-                                        onClick={() => onAction()} disableElevation>
-                            Delete
-                         </StyledButton>   
-                         <StyledButton size='small' variant='contained' disableElevation onClick={handleCloseAlert} disabled={loading}>
+                          <StyledActionBtn size='small' variant='contained' colorProps = {isDelete} disabled={loading}
+                                            onClick={() => onAction()} disableElevation>
+                                {isDelete ? 'Delete' : 'Restore'}
+                            </StyledActionBtn>  
+                         <StyledButton size='small' color='default' variant='contained' disableElevation onClick={handleCloseAlert} disabled={loading}>
                             Cancel
                          </StyledButton> 
                     </div>       
@@ -43,4 +43,15 @@ const StyledButton = styled(Button)`
        margin-left: 15px;
        text-transform : capitalize;
    }
+`
+const StyledActionBtn = styled(Button)`
+    &&& {
+        margin-left: 15px;
+        text-transform : capitalize;
+        ${({ theme, colorProps }) => `
+            background : ${ colorProps && colorProps ? theme.palette.secondary.main : theme.palette.success.main  };
+            color : #fff;    
+        `
+        }
+    }
 `

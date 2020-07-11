@@ -1,9 +1,10 @@
-import { AUTH_START, AUTH_FAIL, AUTH_SUCCESS, LOG_OUT } from '../Actions/actionTypes';
+import { AUTH_START, AUTH_FAIL, AUTH_SUCCESS, LOG_OUT, TOGGLE_THEME } from '../Actions/actionTypes';
 
 const initState = {
     loading : false,
     error : false,
-    isAuth: false
+    isAuth: false,
+    isDark : false
 }
 
 const authReducer = (state = initState, action) => {
@@ -27,6 +28,11 @@ const authReducer = (state = initState, action) => {
                         loading : false,
                         error : true
                     }
+        case TOGGLE_THEME : 
+                    return {
+                        ...state,
+                        isDark : action.val
+                    }            
         case LOG_OUT : 
                       return {
                           ...state,

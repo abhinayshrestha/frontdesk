@@ -25,7 +25,7 @@ function Reports() {
     return (
         <Container>
              <div className='topContainer'>
-                        <TopNavText navText={['Reports','>','Dashboard']} summaryText="Here's what's happening"/>   
+                        <TopNavText navText={[{label :'Reports', to : '/'},{label : 'Dashboard', to : '/'}]} summaryText="Here's what's happening"/>  
                         <ChangeDateBtn onClick={openTimelyOpt} color="primary">
                                 Today <ArrowDropDownIcon /> 
                         </ChangeDateBtn>

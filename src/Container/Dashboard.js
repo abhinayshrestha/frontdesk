@@ -15,6 +15,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import { Snackbar } from '@material-ui/core'
 import { connect } from 'react-redux';
 import { SET_SUCCESS } from '../Store/Actions/actionTypes';
+import Trash from '../Components/Trash';
 
 function Dashboard({ success, setSuccess }) {
  
@@ -52,8 +53,9 @@ function Dashboard({ success, setSuccess }) {
                 <RouteContainer>
                         <Switch>
                             <Route path='/setting' component={Setting} />
-                            <Route path='/manage-clients/:clientId' component={ViewClient}/>
+                            <Route path='/manage-clients/:id' component={ViewClient}/>
                             <Route path='/manage-clients' component={ManageClient}/>
+                            <Route path='/trash' component={Trash}/>
                             <Route path='/' component={Reports} exact/>  
                         </Switch>    
                  </RouteContainer>   
@@ -88,7 +90,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        setSuccess : () => dispatch({ type: SET_SUCCESS })
+        setSuccess : () => dispatch({ type: SET_SUCCESS }),
     }
 }
 
